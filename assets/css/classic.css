@@ -1,0 +1,92 @@
+/* ---------- Re-skin the colors and fonts 98.css hardcodes ---------- */
+
+.title-bar, .window, button, input, label, option, select, table, textarea, ul.tree-view {
+  font-family: var(--font);
+  -webkit-font-smoothing: var(--font-smoothing);
+}
+button, input[type=reset], input[type=submit], .vertical-bar {
+  background-color: var(--face);
+  box-shadow: var(--raised);
+}
+button:not(:disabled):active,
+input[type=reset]:not(:disabled):active,
+input[type=submit]:not(:disabled):active { box-shadow: var(--pressed); }
+.window { background: var(--face); box-shadow: var(--raised-outer); }
+.title-bar { background: linear-gradient(90deg, var(--title-a), var(--title-b)); }
+.title-bar.inactive { background: linear-gradient(90deg, var(--title-inactive-a), var(--title-inactive-b)); }
+.status-bar-field { box-shadow: inset -1px -1px var(--light), inset 1px 1px var(--shadow); }
+legend { background: var(--face); }
+input[type=email], input[type=number], input[type=password], input[type=text], select, textarea,
+ul.tree-view, pre, input[type=checkbox] + label::before { box-shadow: var(--sunken); }
+input[type=checkbox]:active + label::before,
+input[type=checkbox][disabled] + label::before { background: var(--face); }
+select:focus, ul.tree-view a:focus, table > tbody > tr.highlighted { background-color: var(--highlight); color: var(--highlight-text); }
+menu[role=tablist] > li { box-shadow: inset -1px 0 var(--dark), inset 1px 1px var(--light), inset -2px 0 var(--shadow), inset 2px 2px var(--white); }
+menu[role=tablist] > li[aria-selected=true], .window[role=tabpanel] { background-color: var(--face); }
+table > thead > tr > * { background: var(--face); box-shadow: var(--raised); }
+.sunken-panel { border: 0; border-image: none; box-shadow: var(--sunken); padding: 2px; background: #fff; }
+
+/* ---------- Classic scrollbars (Chrome / Edge / Safari) ---------- */
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-track { background: var(--checker); }
+::-webkit-scrollbar-corner { background: var(--face); }
+::-webkit-scrollbar-thumb {
+  background-color: var(--face);
+  box-shadow: var(--raised-outer);
+}
+::-webkit-scrollbar-button { display: none; }
+::-webkit-scrollbar-button:single-button {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: var(--face);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  box-shadow: var(--raised-outer);
+}
+::-webkit-scrollbar-button:single-button:active {
+  box-shadow: inset 1px 1px var(--shadow), inset -1px -1px var(--shadow);
+  background-position: 1px 1px;
+}
+::-webkit-scrollbar-button:single-button:vertical:decrement   { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'%3E%3Crect x='7' y='6' width='1' height='1'/%3E%3Crect x='6' y='7' width='3' height='1'/%3E%3Crect x='5' y='8' width='5' height='1'/%3E%3Crect x='4' y='9' width='7' height='1'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:single-button:vertical:increment   { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'%3E%3Crect x='4' y='6' width='7' height='1'/%3E%3Crect x='5' y='7' width='5' height='1'/%3E%3Crect x='6' y='8' width='3' height='1'/%3E%3Crect x='7' y='9' width='1' height='1'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:single-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'%3E%3Crect x='6' y='7' width='1' height='1'/%3E%3Crect x='7' y='6' width='1' height='3'/%3E%3Crect x='8' y='5' width='1' height='5'/%3E%3Crect x='9' y='4' width='1' height='7'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:single-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'%3E%3Crect x='6' y='4' width='1' height='7'/%3E%3Crect x='7' y='5' width='1' height='5'/%3E%3Crect x='8' y='6' width='1' height='3'/%3E%3Crect x='9' y='7' width='1' height='1'/%3E%3C/svg%3E"); }
+
+/* Firefox can only color its scrollbars */
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-color: var(--face) var(--light); }
+}
+
+
+/* Colours 98.css writes as fixed values, routed through the palette so colour schemes
+   (including the dark ones) reach form fields, lists, buttons and tabs. */
+body { color: var(--text); }
+a { color: var(--link); }
+button, input[type=reset], input[type=submit] { text-shadow: 0 0 var(--text); }
+button:not(:disabled):active, input[type=reset]:not(:disabled):active, input[type=submit]:not(:disabled):active { text-shadow: 1px 1px var(--text); }
+button:focus, input[type=reset]:focus, input[type=submit]:focus,
+input[type=checkbox]:focus + label, input[type=radio]:focus + label, summary:focus { outline-color: var(--focus); }
+:disabled + label, button:disabled, input[type=reset]:disabled, input[type=submit]:disabled { text-shadow: 1px 1px 0 var(--white); }
+:disabled, :disabled + label, input[readonly], input[readonly] + label { color: var(--muted); }
+input[type=email], input[type=number], input[type=password], input[type=text], select, textarea,
+ul.tree-view, pre, table, .sunken-panel { background-color: var(--window); color: var(--window-text); }
+input[type=checkbox] + label::before { background: var(--window); }
+select:focus { background-color: var(--highlight); color: var(--highlight-text); }
+select:focus option { background-color: var(--window); color: var(--window-text); }
+ul.tree-view a { color: var(--window-text); }
+menu[role=tablist] > li > a { color: var(--text); }
+fieldset { border-image: none; border: 1px solid var(--shadow); box-shadow: inset 1px 1px var(--white), 1px 1px var(--white); }  /* etched groove */
+.title-bar-text { color: var(--title-text); }
+
+/* Syntax highlighting (Hugo's classes, "vs" style) */
+.chroma { color: var(--window-text); }
+.chroma .c, .chroma .c1, .chroma .cm, .chroma .cs, .chroma .ch, .chroma .cp, .chroma .cpf { color: #008000; }
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt, .chroma .nb, .chroma .ow { color: #0000ff; }
+.chroma .s, .chroma .s1, .chroma .s2, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .sd, .chroma .se, .chroma .sh, .chroma .si, .chroma .sr, .chroma .ss, .chroma .sx, .chroma .dl { color: #a31515; }
+.chroma .nc, .chroma .nt, .chroma .nn { color: #2b91af; }
+.chroma .na, .chroma .nv, .chroma .vi, .chroma .vg { color: #ff0000; }
+.chroma .gh, .chroma .gu { font-weight: bold; color: #000080; }
+.chroma .gd { color: #a31515; }
+.chroma .gi { color: #008000; }
+.chroma .ln, .chroma .lnt { color: var(--muted); margin-right: .6em; }

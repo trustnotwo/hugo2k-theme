@@ -1,0 +1,12 @@
+/* Royale Noir Dark: Royale Noir chrome with dark, blue-tinted insides */
+:root {
+  --face: #262b35; --light: #333a47; --white: #434b5a; --shadow: #10141b; --dark: #000;
+  --text: #e2e6ee; --window: #181c24; --window-text: #d6dbe5;
+  --link: #8ab4f8; --link-visited: #b9a3f0; --muted: #96a0b2;
+  --note-bg: #232f42; --note-text: #d6e2f5; --note-border: #3e5272;
+  --code-bg: #20252f; --line: #2e3542;
+  --focus: #ddd; --alert-text: #ff9a9a;
+  --xp-line: #3b4352; --xp-pane: #4f5c74; --xp-panel: #1f242d;
+  --xp-tab-a: #333a47; --xp-tab-b: #262b35; --xp-tab-border: #4f5c74;
+  --xp-head-a: #333a47; --xp-head-b: #262b35;
+}

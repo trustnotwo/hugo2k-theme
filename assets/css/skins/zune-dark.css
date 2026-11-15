@@ -1,0 +1,12 @@
+/* Zune Dark: Zune chrome with dark insides */
+:root {
+  --face: #2b2b2b; --light: #3a3a3a; --white: #4a4a4a; --shadow: #151515; --dark: #000;
+  --text: #e4e4e4; --window: #1c1c1c; --window-text: #dcdcdc;
+  --link: #ff9a52; --link-visited: #e0a07a; --muted: #9a9a9a;
+  --note-bg: #3a2a1c; --note-text: #f3dcc8; --note-border: #6a4a30;
+  --code-bg: #262626; --line: #333;
+  --focus: #ddd; --alert-text: #ff9a9a;
+  --xp-line: #444; --xp-pane: #555; --xp-panel: #232323;
+  --xp-tab-a: #3a3a3a; --xp-tab-b: #2b2b2b; --xp-tab-border: #555;
+  --xp-head-a: #3a3a3a; --xp-head-b: #2b2b2b;
+}

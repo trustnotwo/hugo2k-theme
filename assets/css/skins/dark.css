@@ -1,0 +1,28 @@
+/* Dark: a dim, low-glare scheme on the Windows 2000 shapes. Not a real Windows scheme. */
+:root {
+  color-scheme: dark;
+  --desktop: #1d2a3a;
+  --face: #2d2d30; --light: #3a3a3e; --white: #56565c; --shadow: #18181a; --dark: #000;
+  --highlight: #2f5e9e; --highlight-text: #fff;
+  --title-a: #1e3a66; --title-b: #3f6aa8;
+  --title-inactive-a: #3a3a3e; --title-inactive-b: #4c4c52;
+  --banner-a: #1e3a66; --banner-b: #000;
+  --text: #e2e2e2;
+  --window: #1e1e1e; --window-text: #d8d8d8;
+  --link: #7ab4ff; --link-visited: #c39bff;
+  --muted: #9a9a9a;
+  --note-bg: #38331f; --note-text: #f0e6c0; --note-border: #6b6340;
+  --code-bg: #2a2a2a; --line: #333336;
+  --title-text: #fff; --focus: #ddd; --alert-text: #ff9a9a;
+}
+.dp-mini-body { color: var(--pv-text, #000); }
+
+/* Syntax highlighting, dark */
+.chroma .c, .chroma .c1, .chroma .cm, .chroma .cs, .chroma .ch, .chroma .cp, .chroma .cpf { color: #6a9955; }
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt, .chroma .nb, .chroma .ow { color: #569cd6; }
+.chroma .s, .chroma .s1, .chroma .s2, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .sd, .chroma .se, .chroma .sh, .chroma .si, .chroma .sr, .chroma .ss, .chroma .sx, .chroma .dl { color: #ce9178; }
+.chroma .nc, .chroma .nt, .chroma .nn { color: #4ec9b0; }
+.chroma .na, .chroma .nv, .chroma .vi, .chroma .vg { color: #9cdcfe; }
+.chroma .gh, .chroma .gu { color: #9cdcfe; }
+.chroma .gd { color: #f48771; }
+.chroma .gi { color: #89d185; }

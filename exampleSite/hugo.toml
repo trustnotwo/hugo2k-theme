@@ -13,7 +13,8 @@ themesDir = "../.."
 
 [params]
   description = "A personal site that boots straight into the desktop."
-  style = "2000"              # "2000" (default) or "98"
+  style = "2000"              # default look: "2000", "98", "dark", "zune", "royale-noir", "zune-dark" or "royale-noir-dark"
+                              # (visitors can switch in Start > Settings; see data/themes.yaml in the theme)
   mainSections = ["posts"]
   dateFormat = "1/2/2006"
   recentCount = 8
@@ -24,6 +25,16 @@ themesDir = "../.."
   # Background: the Windows 2000 blue (#3a6ea5) unless you change it.
   # desktopColor = "#008080"            # any CSS colour
   # wallpaper = "/images/wallpaper.jpg" # an image in static/images/, drawn over the colour
+  # wallpaperName = "My Photo"          # its name in Display Properties (default: the file name)
+  # themeWallpapers = false             # hide the theme's seamless tiles from Display Properties
+
+  # Dark mode: visitors whose system is set to dark get these until they pick a look themselves.
+  # autoDark = true
+  # darkStyle = "royale-noir-dark"      # default "dark" (Windows 2000, dark)
+  # darkWallpaper = "/wallpapers/propaganda/flooded-motel-4.jpg"
+  # darkWallpaperPosition = "tile"      # stretch (default), center or tile
+
+  # hideEmptySections = false           # show menu entries for sections that have no pages yet
 
   # Icons: the theme ships the SE98 set. Put a file with the same name in static/icons/ to replace one.
   # iconFormat = "svg"        # use your own static/icons/<name>.svg instead of PNGs
@@ -58,5 +69,4 @@ themesDir = "../.."
     icon = "notepad"
 
 [markup.highlight]
-  style = "vs"
-  noClasses = true
+  noClasses = false           # the theme colours code, so it follows light and dark looks

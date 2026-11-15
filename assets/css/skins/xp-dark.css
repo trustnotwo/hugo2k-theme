@@ -1,0 +1,21 @@
+/* Dark window insides for the XP looks (Zune Dark, Royale Noir Dark). The chrome images stay;
+   panes, documents, menus and lists go dark. Colours come from zune-dark.css / royale-noir-dark.css. */
+:root { color-scheme: dark; }
+.content pre, .content code { color: var(--window-text); }
+table > thead > tr > * { background: linear-gradient(180deg, var(--xp-head-a), var(--xp-head-b)); color: var(--text); }
+.menu-bar { border-bottom-color: var(--xp-line); }
+.ctx-menu { background: var(--face); box-shadow: inset 0 0 0 1px var(--xp-line), 2px 2px 6px rgba(0, 0, 0, .6); }
+.ctx-item { color: var(--text); }
+.ctx-sep { border-top-color: var(--xp-line); border-bottom-color: rgba(255, 255, 255, .06); }
+/* The GTK push buttons are light images: keep their label dark */
+button, input[type=reset], input[type=submit], .btn98 { color: #000; }
+.dp-panel label, .dp-panel legend { color: var(--text); }
+legend { background: var(--xp-panel); color: var(--text); }
+.status-bar-field { color: var(--text); }
+
+/* Syntax highlighting, dark */
+.chroma .c, .chroma .c1, .chroma .cm, .chroma .cs, .chroma .ch, .chroma .cp, .chroma .cpf { color: #6a9955; }
+.chroma .k, .chroma .kc, .chroma .kd, .chroma .kn, .chroma .kp, .chroma .kr, .chroma .kt, .chroma .nb, .chroma .ow { color: #569cd6; }
+.chroma .s, .chroma .s1, .chroma .s2, .chroma .sa, .chroma .sb, .chroma .sc, .chroma .sd, .chroma .se, .chroma .sh, .chroma .si, .chroma .sr, .chroma .ss, .chroma .sx, .chroma .dl { color: #ce9178; }
+.chroma .nc, .chroma .nt, .chroma .nn { color: #4ec9b0; }
+.chroma .na, .chroma .nv, .chroma .vi, .chroma .vg { color: #9cdcfe; }

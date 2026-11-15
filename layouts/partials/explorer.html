@@ -9,12 +9,7 @@
       <input id="address" type="text" value="{{ .Permalink }}" readonly>
     </div>
     <h1 id="page-title" class="visually-hidden">{{ .Title }}</h1>
-    {{- if eq (string (site.Params.style | default "2000")) "98" }}
-    {{- with .Content }}
-    <div class="document content folder-intro">{{ . }}</div>
-    {{- end }}
-    {{ partial "file-table.html" $pager.Pages }}
-    {{- else }}
+    {{- /* The 95/98 styles show the folder text above a plain file list (skins/98.css). */}}
     <div class="explorer-pane">
       <aside class="webview">
         <img src="{{ partial "icon-url.html" (dict "name" "folder-open" "size" 32) }}" alt="" width="32" height="32">
@@ -23,13 +18,12 @@
         {{- with .Content }}
         <div class="content">{{ . }}</div>
         {{- else }}
-        <p>{{ .Description | default "Select an item to view its description." }}</p>
+        <p class="webview-hint">{{ .Description | default "Select an item to view its description." }}</p>
         {{- end }}
         <p class="webview-count">{{ len .Pages }} object(s)</p>
       </aside>
       {{ partial "file-table.html" $pager.Pages }}
     </div>
-    {{- end }}
     {{ partial "pagination.html" $pager }}
   </div>
   <div class="status-bar">

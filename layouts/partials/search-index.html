@@ -1,0 +1,20 @@
+{{- /* JSON list of every published page and section, for the Search window and the Command Prompt.
+       Built once per build (partialCached in head.html) and served as a fingerprinted file.
+       Drafts are never built, so they never appear here. */ -}}
+{{- $out := slice }}
+{{- range where site.Pages "Kind" "in" (slice "home" "section" "page") }}
+  {{- $e := dict
+        "t" .LinkTitle
+        "u" .RelPermalink
+        "k" .Kind
+        "d" (cond .Date.IsZero "" (.Date.Format "2006-01-02T15:04:05"))
+        "y" (cond .IsPage (.Params.filetype | default "Document") "File Folder")
+        "b" (len .RawContent)
+        "g" (.Params.tags | default slice)
+        "s" (.Summary | plainify | htmlUnescape | truncate 200)
+        "c" (.Content | plainify | htmlUnescape)
+        "r" (strings.TrimSpace .RawContent) }}
+  {{- with .Parent }}{{ $e = merge $e (dict "p" .RelPermalink "f" .LinkTitle) }}{{ end }}
+  {{- $out = $out | append $e }}
+{{- end }}
+{{- return ($out | jsonify) }}

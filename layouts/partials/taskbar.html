@@ -10,6 +10,11 @@
         {{- range partialCached "nav-items.html" . "nav" }}
         <li><a href="{{ .url }}"><img src="{{ partial "icon-url.html" (dict "name" .icon "size" 32) }}" alt="" width="32" height="32">{{ .name }}</a></li>
         {{- end }}
+        {{- /* Built-in programs (theme98.js); hidden when JavaScript is off */}}
+        <li class="separator js-only" role="separator"></li>
+        <li class="js-only"><a href="#search" data-app="search"><img src="{{ partial "icon-url.html" (dict "name" "search" "size" 32) }}" alt="" width="32" height="32">Search</a></li>
+        <li class="js-only"><a href="#cmd" data-app="cmd"><img src="{{ partial "icon-url.html" (dict "name" "command-prompt" "size" 32) }}" alt="" width="32" height="32">Command Prompt</a></li>
+        <li class="js-only"><a href="#display" data-app="display"><img src="{{ partial "icon-url.html" (dict "name" "settings" "size" 32) }}" alt="" width="32" height="32">Settings</a></li>
         {{- with site.Home.OutputFormats.Get "rss" }}
         <li class="separator" role="separator"></li>
         <li><a href="{{ .RelPermalink }}"><img src="{{ partial "icon-url.html" (dict "name" "internet-document" "size" 32) }}" alt="" width="32" height="32">RSS Feed</a></li>

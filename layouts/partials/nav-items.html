@@ -3,7 +3,12 @@
 {{- $items := slice }}
 {{- with site.Menus.main }}
   {{- range . }}
+    {{- /* A menu entry for a section with nothing published in it stays hidden until it has a page
+           (params.hideEmptySections = false always shows it). */}}
+    {{- $empty := and .Page .Page.IsSection (not .Page.RegularPagesRecursive) }}
+    {{- if or (not $empty) (eq site.Params.hideEmptySections false) }}
     {{- $items = $items | append (dict "name" .Name "url" .URL "icon" (.Params.icon | default "folder")) }}
+    {{- end }}
   {{- end }}
 {{- else }}
   {{- $items = $items | append (dict "name" "My Computer" "url" ("/" | relURL) "icon" "computer") }}

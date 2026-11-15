@@ -8,13 +8,168 @@
 {{- end }}
 <meta name="theme-color" content="#000080">
 <link rel="icon" href="{{ with site.Params.favicon }}{{ . | relURL }}{{ else }}{{ partial "icon-url.html" (dict "name" "computer" "size" 32) }}{{ end }}">
-{{- /* 98.css by Jordan Scales (MIT). Override with params.css98 to self-host. */}}
-<link rel="stylesheet" href="{{ site.Params.css98 | default "https://unpkg.com/98.css@0.1.20/dist/98.css" }}">
-{{- $skin := string (site.Params.style | default "2000") }}
-{{- $parts := slice (resources.Get "css/theme.css") }}
-{{- with resources.Get (printf "css/skins/%s.css" $skin) }}{{ $parts = $parts | append . }}{{ end }}
-{{- $css := $parts | resources.Concat "css/site.css" | minify | fingerprint }}
-<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- /* Every look in data/themes.yaml gets its own stylesheet bundle: theme.css plus that look's files.
+       Windows are drawn by 98.css (MIT, loaded from unpkg; params.css98 points it somewhere else).
+       Only the current look's files load; the inline script below swaps them before the page draws
+       when a visitor has picked another look in Display Properties, or has dark mode switched on. */}}
+{{- $bases := dict
+      "98" (dict "href" (site.Params.css98 | default "https://unpkg.com/98.css@0.1.20/dist/98.css") "integrity" (cond (isset site.Params "css98") "" "sha384-JmNNk193D7Nic/O+IY6TsPxWSTvumI9a3g/vTfFCnQ3wFl+SL4RU0fjkutdYNiXv")) }}
+{{- $style := string (site.Params.style | default "2000") }}
+{{- $list := hugo.Data.themes }}
+{{- if not (where $list "id" $style) }}
+  {{- /* A custom style name: theme.css + classic look + assets/css/skins/<name>.css */}}
+  {{- $list = $list | append (dict "id" $style "name" (title $style) "group" "Custom" "base" "98" "files" (slice "classic" (printf "skins/%s" $style))) }}
+{{- end }}
+{{- $themes := dict }}
+{{- $order := slice }}
+{{- range $list }}
+  {{- $parts := slice (resources.Get "css/theme.css") }}
+  {{- range .files }}{{ with resources.Get (printf "css/%s.css" .) }}{{ $parts = $parts | append . }}{{ end }}{{ end }}
+  {{- $css := $parts | resources.Concat (printf "css/site-%s.css" .id) | minify | fingerprint }}
+  {{- $themes = merge $themes (dict .id (dict "href" $css.RelPermalink "integrity" $css.Data.Integrity "base" .base "name" .name "group" .group "dark" (.dark | default false) "icons" (.icons | default "") "chrome" (.chrome | default "") "pv" (.pv | default dict))) }}
+  {{- $order = $order | append .id }}
+{{- end }}
+{{- $cur := index $themes $style }}
+{{- $base := index $bases $cur.base }}
+<link rel="stylesheet" id="base-css" href="{{ $base.href }}"{{ with $base.integrity }} integrity="{{ . }}" crossorigin="anonymous"{{ end }}>
+<link rel="stylesheet" id="theme-css" href="{{ $cur.href }}" integrity="{{ $cur.integrity }}">
+{{- /* Backgrounds offered in Display Properties: the site's own (params.wallpapers, or params.wallpaper),
+       then the theme's seamless tiles from data/wallpapers.yaml (params.themeWallpapers = false hides those). */}}
+{{- $wallpapers := slice }}
+{{- with site.Params.wallpapers }}{{ range . }}{{ $wallpapers = $wallpapers | append (dict "name" .name "url" (.url | relURL) "tile" (.tile | default false) "size" (.size | default 0)) }}{{ end }}
+{{- else }}{{ with site.Params.wallpaper }}{{ $wallpapers = $wallpapers | append (dict "name" (site.Params.wallpaperName | default (path.BaseName .)) "url" (. | relURL)) }}{{ end }}{{ end }}
+{{- if ne site.Params.themeWallpapers false }}
+  {{- range hugo.Data.wallpapers }}{{ $wallpapers = $wallpapers | append (dict "name" .name "url" (printf "wallpapers/%s" .file | relURL) "tile" (.tile | default false) "size" (.size | default 0)) }}{{ end }}
+{{- end }}
+{{- $icons := dict }}
+{{- range slice "command-prompt" "computer" "document" "folder" "folder-open" "search" "settings" "info" "warning" "error" }}
+  {{- $icons = merge $icons (dict . (dict "16" (partial "icon-url.html" (dict "name" . "size" 16)) "32" (partial "icon-url.html" (dict "name" . "size" 32)))) }}
+{{- end }}
+{{- /* Icon sets a look can use instead of static/icons/ (names it doesn't have fall back) */}}
+{{- $iconSets := dict "xp" (dict "base" ("skins/xp-icons/" | relURL) "names" (slice "command-prompt" "computer" "document" "error" "folder" "folder-open" "help" "image" "info" "internet" "internet-document" "my-documents" "network" "notepad" "recycle-bin" "run" "search" "settings" "shut-down" "start" "warning" "zip")) }}
+{{- $index := partialCached "search-index.html" . | resources.FromString "search-index.json" | minify | fingerprint }}
+{{- $cfg := dict
+      "title" site.Title
+      "home" ("/" | relURL)
+      "style" $style
+      "themes" $themes
+      "order" $order
+      "bases" $bases
+      "autoDark" (site.Params.autoDark | default false)
+      "darkStyle" (site.Params.darkStyle | default "dark")
+      "darkWallpaper" (cond (isset site.Params "darkwallpaper") (site.Params.darkWallpaper | relURL) "")
+      "darkWallpaperPosition" (site.Params.darkWallpaperPosition | default "")
+      "iconSets" $iconSets
+      "skinBase" ("skins/" | relURL)
+      "desktopColor" (site.Params.desktopColor | default "")
+      "wallpaper" (cond (isset site.Params "wallpaper") (site.Params.wallpaper | relURL) "")
+      "wallpapers" $wallpapers
+      "readableProse" (site.Params.readableProse | default false)
+      "dateFormat" (site.Params.dateFormat | default "1/2/2006")
+      "icons" $icons
+      "index" $index.RelPermalink }}
+<script type="application/json" id="theme-config">{{ $cfg | jsonify | safeJS }}</script>
+<script>
+/* Visitor display settings (Display Properties) applied before the page draws. */
+(function () {
+  var d = document.documentElement, ls = null;
+  d.classList.add('js');
+  try { ls = window.localStorage; } catch (e) {}
+  var cfg = JSON.parse(document.getElementById('theme-config').textContent);
+  var T = window.theme98 = {
+    cfg: cfg,
+    load: function () {
+      try { return JSON.parse(ls.getItem('theme98.prefs') || '{}') || {}; } catch (e) { return {}; }
+    },
+    save: function (p) {
+      try { ls.setItem('theme98.prefs', JSON.stringify(p)); return true; } catch (e) { return false; }
+    },
+    customWallpaper: function () {
+      try { return ls.getItem('theme98.customWallpaper'); } catch (e) { return null; }
+    },
+    // True when the site's dark-mode defaults apply: the visitor hasn't picked a look and their system is dark.
+    autoDarkOn: function (p) {
+      return !(p.style && cfg.themes[p.style]) && !!cfg.autoDark && !!cfg.themes[cfg.darkStyle] &&
+        !!window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+    // The wallpaper and picture position used when the visitor hasn't chosen one.
+    defaultWallpaper: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaper : cfg.wallpaper; },
+    defaultPosition: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaperPosition : ''; },
+    // Background image URL for a prefs object ('' = none).
+    wallpaperUrl: function (p) {
+      if (!('wallpaper' in p)) return T.defaultWallpaper(p);
+      return p.wallpaper === 'custom' ? (T.customWallpaper() || '') : p.wallpaper;
+    },
+    // The look in effect: the visitor's pick, else the site's dark look on dark-mode systems, else the site's look.
+    themeId: function (p) {
+      if (p.style && cfg.themes[p.style]) return p.style;
+      return T.autoDarkOn(p) ? cfg.darkStyle : cfg.style;
+    },
+    apply: function (p) {
+      var id = T.themeId(p), th = cfg.themes[id], base = cfg.bases[th.base];
+      function swap(el, href, integrity) {
+        if (!el || el.getAttribute('href') === href) return;
+        if (integrity) { el.integrity = integrity; el.crossOrigin = el.id === 'base-css' ? 'anonymous' : null; }
+        else el.removeAttribute('integrity');
+        el.href = href;
+      }
+      swap(document.getElementById('base-css'), base.href, base.integrity);
+      swap(document.getElementById('theme-css'), th.href, th.integrity);
+      d.setAttribute('data-theme', id);
+      T.iconSet = cfg.iconSets[th.icons] || null;
+      if (document.body) T.swapIcons(document);
+      d.classList.toggle('theme-dark', !!th.dark);
+      d.classList.toggle('prose-readable', 'large' in p ? !!p.large : !!cfg.readableProse);
+      d.classList.toggle('big-icons', !!p.bigIcons);
+      var r = [], u = T.wallpaperUrl(p);
+      var pos = 'position' in p ? p.position : ('wallpaper' in p ? '' : T.defaultPosition(p));
+      if (p.color) r.push(':root,body{--desktop:' + p.color + ' !important}');
+      if ('wallpaper' in p || u !== cfg.wallpaper) r.push('body{background-image:' + (u ? 'url("' + u + '")' : 'none') + ' !important}');
+      if (pos === 'center') r.push('body{background-size:auto !important;background-repeat:no-repeat !important}');
+      if (pos === 'tile') r.push('body{background-size:auto !important;background-repeat:repeat !important;background-position:0 0 !important}');
+      var st = document.getElementById('desktop-prefs');
+      if (!st) { st = document.createElement('style'); st.id = 'desktop-prefs'; document.head.appendChild(st); }
+      st.textContent = r.join(' ');
+      if (document.body) {
+        document.body.classList.toggle('has-wallpaper', !!u);
+        document.body.classList.toggle('prose-readable', d.classList.contains('prose-readable'));
+      }
+    }
+  };
+  // Points icon <img>s (static/icons/<name>-<size>.png) at the look's icon set, or back.
+  var ICON = /\/icons\/([a-z0-9-]+)-(16|32)\.png$/;
+  T.iconUrl = function (url) {
+    var m = ICON.exec(url || ''), set = T.iconSet;
+    return m && set && set.names.indexOf(m[1]) >= 0 ? set.base + m[1] + '-' + m[2] + '.png' : url;
+  };
+  T.swapIcons = function (root) {
+    var imgs = root.querySelectorAll ? root.querySelectorAll('img') : [];
+    for (var i = 0; i < imgs.length; i++) {
+      var img = imgs[i], orig = img.getAttribute('data-icon') || img.getAttribute('src');
+      if (!ICON.test(orig)) continue;
+      img.setAttribute('data-icon', orig);
+      var want = T.iconUrl(orig);
+      if (img.getAttribute('src') !== want) img.setAttribute('src', want);
+    }
+  };
+  T.apply(T.load());
+  // While the page is still arriving, swap icons as they're parsed so the default set never shows.
+  if (T.iconSet && window.MutationObserver) {
+    var mo = new MutationObserver(function (list) {
+      for (var i = 0; i < list.length; i++) {
+        for (var j = 0; j < list[i].addedNodes.length; j++) {
+          var n = list[i].addedNodes[j];
+          if (n.nodeType !== 1) continue;
+          if (n.tagName === 'IMG') T.swapIcons({ querySelectorAll: function () { return [n]; } });
+          else T.swapIcons(n);
+        }
+      }
+    });
+    mo.observe(d, { childList: true, subtree: true });
+    document.addEventListener('DOMContentLoaded', function () { T.swapIcons(document); mo.disconnect(); });
+  }
+})();
+</script>
 {{- range .AlternativeOutputFormats }}
 {{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .Permalink site.Title | safeHTML }}
 {{- end }}

@@ -20,7 +20,10 @@
     {{ partial "titlebar.html" (dict "title" "Recent Documents" "icon" "folder") }}
     <div class="window-body">
       {{ partial "file-table.html" . }}
-      {{- with site.GetPage (index site.Params.mainSections 0) }}
+      {{- /* "View all" opens the first main section that has something in it */}}
+      {{- $all := false }}
+      {{- range site.Params.mainSections }}{{ with site.GetPage . }}{{ if and (not $all) .RegularPagesRecursive }}{{ $all = . }}{{ end }}{{ end }}{{ end }}
+      {{- with $all }}
       <div class="dialog-buttons align-end">
         <a class="btn98" href="{{ .RelPermalink }}">View all…</a>
       </div>

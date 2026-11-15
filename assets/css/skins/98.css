@@ -1,0 +1,13 @@
+/* Windows 98 (and 95): Explorer windows have no Web view panel; the folder's text sits in a
+   white box above a plain file list. Colours are theme.css's defaults. */
+.explorer-pane { display: block; background: none; box-shadow: none; padding: 0; }
+.webview {
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border: 0;
+  background: var(--window);
+  box-shadow: var(--sunken);
+}
+.webview > img, .webview > h2, .webview-rule, .webview-count, .webview-hint { display: none; }
+.webview:not(:has(.content)) { display: none; }
+.explorer-pane .file-table { box-shadow: var(--sunken); padding: 2px; }

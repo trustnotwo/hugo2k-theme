@@ -1,0 +1,15 @@
+# Seamless tiles offered in Display Properties > Background (static/wallpapers/).
+# The Propaganda tiles are GPL-2.0, from https://github.com/BenjaminHCCarr/PropagandaTiles
+# (see static/wallpapers/propaganda/LICENSE). size: the tile width in pixels, for the preview.
+- name: "Flooded Motel"
+  file: propaganda/flooded-motel-4.jpg
+  tile: true
+  size: 511
+- name: "Cold Blooded"
+  file: propaganda/cold-blooded-4.jpg
+  tile: true
+  size: 512
+- name: "Wrestling Dog"
+  file: propaganda/wrestling-dog-2.jpg
+  tile: true
+  size: 512

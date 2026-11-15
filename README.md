@@ -1,4 +1,4 @@
-# hugo-theme-98
+# hugo2k-theme
 
 A retro desktop theme for [Hugo](https://gohugo.io/) in the style of Windows 2000, built on
 [98.css](https://github.com/jdan/98.css) by Jordan Scales. A classic Windows 98 style is included too.
@@ -24,10 +24,10 @@ hugo new site mysite
 
 ```bash
 cd mysite
-git clone https://github.com/trustnotwo/hugo-theme-98 themes/hugo-theme-98
+git clone https://github.com/trustnotwo/hugo2k-theme themes/hugo2k-theme
 ```
 
-Then set `theme = "hugo-theme-98"` in `hugo.toml`. [`exampleSite/hugo.toml`](exampleSite/hugo.toml)
+Then set `theme = "hugo2k-theme"` in `hugo.toml`. [`exampleSite/hugo.toml`](exampleSite/hugo.toml)
 is a complete starting config. To preview the example site, run this from the `exampleSite` folder:
 
 ```bash

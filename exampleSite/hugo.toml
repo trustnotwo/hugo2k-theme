@@ -1,7 +1,7 @@
 baseURL = "https://example.org/"
 locale = "en-US"
 title = "My 98 Site"
-theme = "hugo-theme-98"
+theme = "hugo2k-theme"
 themesDir = "../.."
 
 [pagination]

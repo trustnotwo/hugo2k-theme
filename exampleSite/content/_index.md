@@ -4,7 +4,7 @@ title: "Home"
 
 # Welcome
 
-Welcome! This site runs on **hugo-theme-98**, a Hugo theme built on
+Welcome! This site runs on **hugo2k-theme**, a Hugo theme built on
 [98.css](https://github.com/jdan/98.css).
 
 - Every page opens in its own window, with title-bar buttons that work: minimize, maximize and close.

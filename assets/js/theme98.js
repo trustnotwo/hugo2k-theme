@@ -1,4 +1,4 @@
-/* hugo-theme-98 — tiny window manager. Everything degrades gracefully without JS. */
+/* hugo2k-theme — tiny window manager. Everything degrades gracefully without JS. */
 (function () {
   'use strict';
   var doc = document;

@@ -1,0 +1,21 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} - {{ site.Title }}{{ end }}</title>
+{{- $desc := "" }}
+{{- with .Description }}{{ $desc = . }}{{ else }}{{ if .IsPage }}{{ $desc = .Summary | plainify | truncate 160 }}{{ else }}{{ $desc = site.Params.description }}{{ end }}{{ end }}
+{{- with $desc }}
+<meta name="description" content="{{ . }}">
+{{- end }}
+<meta name="theme-color" content="#000080">
+<link rel="icon" href="{{ with site.Params.favicon }}{{ . | relURL }}{{ else }}{{ partial "icon-url.html" (dict "name" "computer" "size" 32) }}{{ end }}">
+{{- /* 98.css by Jordan Scales (MIT). Override with params.css98 to self-host. */}}
+<link rel="stylesheet" href="{{ site.Params.css98 | default "https://unpkg.com/98.css@0.1.20/dist/98.css" }}">
+{{- $skin := string (site.Params.style | default "2000") }}
+{{- $parts := slice (resources.Get "css/theme.css") }}
+{{- with resources.Get (printf "css/skins/%s.css" $skin) }}{{ $parts = $parts | append . }}{{ end }}
+{{- $css := $parts | resources.Concat "css/site.css" | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+{{- range .AlternativeOutputFormats }}
+{{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .Permalink site.Title | safeHTML }}
+{{- end }}
+{{- partial "head-extra.html" . }}

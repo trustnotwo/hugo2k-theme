@@ -1,0 +1,33 @@
+{{- /* Explorer-style "details" view. Context: a page collection. */ -}}
+{{- $fmt := site.Params.dateFormat | default "1/2/2006" }}
+<div class="sunken-panel file-table">
+  <table class="interactive">
+    <thead>
+      <tr>
+        <th class="col-name">Name</th>
+        <th class="col-size">Size</th>
+        <th class="col-type">Type</th>
+        <th class="col-date">Modified</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{- range . }}
+      <tr data-href="{{ .RelPermalink }}">
+        <td class="col-name">
+          <a href="{{ .RelPermalink }}">
+            <img src="{{ partial "icon-url.html" (dict "name" (cond .IsPage "document" "folder") "size" 16) }}" alt="" width="16" height="16">
+            <span>{{ .LinkTitle }}</span>
+          </a>
+        </td>
+        <td class="col-size">
+          {{- if .IsPage }}{{ $kb := div (len .RawContent) 1024 }}{{ if lt $kb 1 }}{{ $kb = 1 }}{{ end }}{{ $kb }}KB{{ end -}}
+        </td>
+        <td class="col-type">{{ if not .IsPage }}File Folder{{ else }}{{ .Params.filetype | default "Document" }}{{ end }}</td>
+        <td class="col-date">{{ if not .Date.IsZero }}{{ .Date.Format $fmt }}{{ end }}</td>
+      </tr>
+      {{- else }}
+      <tr><td colspan="4" class="empty">This folder is empty.</td></tr>
+      {{- end }}
+    </tbody>
+  </table>
+</div>

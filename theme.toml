@@ -1,0 +1,11 @@
+name = "98"
+license = "MIT"
+licenselink = "https://github.com/trustnotwo/hugo-theme-98/blob/main/LICENSE"
+description = "A Windows 2000 desktop theme built on 98.css: draggable windows, an Explorer file list, a Start menu and a taskbar."
+homepage = "https://github.com/trustnotwo/hugo-theme-98"
+tags = ["retro", "blog", "minimal", "windows-98", "windows-2000", "98.css"]
+features = ["blog", "taxonomies", "pagination", "rss", "shortcodes", "responsive"]
+min_version = "0.170.0"
+
+[author]
+  name = "trustnotwo"

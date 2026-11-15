@@ -1,0 +1,22 @@
+{{- /*
+  YouTube embed at a sensible size (replaces Hugo's built-in, which always fills the column).
+  Usage: {{< youtube VIDEO_ID >}}
+         {{< youtube id="VIDEO_ID" title="What the video is" start="90" align="center" >}}
+  Left-aligned unless align="center" or align="right". Uses YouTube's privacy-enhanced (youtube-nocookie.com) player.
+*/ -}}
+{{- $id := "" }}{{ $title := "YouTube video" }}{{ $start := "" }}{{ $align := "" }}
+{{- if .IsNamedParams }}
+  {{- $id = .Get "id" }}
+  {{- with .Get "title" }}{{ $title = . }}{{ end }}
+  {{- with .Get "start" }}{{ $start = . }}{{ end }}
+  {{- with .Get "align" }}{{ if in (slice "center" "right") . }}{{ $align = . }}{{ else if ne . "left" }}{{ errorf "youtube shortcode: align must be left, center or right: %s" $.Position }}{{ end }}{{ end }}
+{{- else }}
+  {{- $id = .Get 0 }}
+{{- end }}
+{{- if not $id }}{{ errorf "youtube shortcode needs a video ID: %s" .Position }}{{ end }}
+<div class="video-embed{{ with $align }} video-{{ . }}{{ end }}">
+  <iframe src="https://www.youtube-nocookie.com/embed/{{ $id }}{{ with $start }}?start={{ . }}{{ end }}"
+    title="{{ $title }}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+    allowfullscreen></iframe>
+</div>

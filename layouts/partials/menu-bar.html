@@ -1,0 +1,5 @@
+<nav class="menu-bar" aria-label="Site menu">
+  {{- range partialCached "nav-items.html" . "nav" }}
+  <a href="{{ .url }}">{{ .name }}</a>
+  {{- end }}
+</nav>

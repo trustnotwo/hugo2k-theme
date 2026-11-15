@@ -1,0 +1,5 @@
+{{- /* {{< fieldset legend="Options" >}}Markdown here{{< /fieldset >}} */ -}}
+<fieldset class="shortcode-fieldset">
+  {{- with .Get "legend" }}<legend>{{ . }}</legend>{{ end }}
+  {{ .Inner | .Page.RenderString (dict "display" "block") }}
+</fieldset>

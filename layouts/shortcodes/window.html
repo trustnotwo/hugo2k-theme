@@ -1,0 +1,10 @@
+{{- /* {{< window title="Hello" icon="document" >}}Markdown here{{< /window >}} */ -}}
+<div class="window shortcode-window">
+  {{ partial "titlebar.html" (dict "title" (.Get "title" | default "Untitled") "icon" (.Get "icon" | default "document")) }}
+  <div class="window-body">
+    {{ .Inner | .Page.RenderString (dict "display" "block") }}
+  </div>
+  {{- with .Get "status" }}
+  <div class="status-bar"><p class="status-bar-field">{{ . }}</p></div>
+  {{- end }}
+</div>

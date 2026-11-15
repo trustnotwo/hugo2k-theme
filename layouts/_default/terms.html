@@ -1,0 +1,40 @@
+{{ define "main" }}
+<section class="window main-window" data-task="{{ .Title }}" aria-labelledby="page-title">
+  {{ partial "titlebar.html" (dict "title" (printf "Exploring - %s" .Title) "icon" "folder") }}
+  {{ partial "menu-bar.html" . }}
+  <div class="window-body">
+    <div class="address-bar">
+      <label for="address">Address</label>
+      <input id="address" type="text" value="{{ .Permalink }}" readonly>
+    </div>
+    <h1 id="page-title" class="visually-hidden">{{ .Title }}</h1>
+    <div class="sunken-panel file-table">
+      <table class="interactive">
+        <thead>
+          <tr><th class="col-name">Name</th><th class="col-size">Items</th><th class="col-type">Type</th></tr>
+        </thead>
+        <tbody>
+          {{- range .Data.Terms.ByCount }}
+          <tr data-href="{{ .Page.RelPermalink }}">
+            <td class="col-name">
+              <a href="{{ .Page.RelPermalink }}">
+                <img src="{{ partial "icon-url.html" (dict "name" "folder" "size" 16) }}" alt="" width="16" height="16">
+                <span>{{ .Page.LinkTitle }}</span>
+              </a>
+            </td>
+            <td class="col-size">{{ .Count }}</td>
+            <td class="col-type">File Folder</td>
+          </tr>
+          {{- else }}
+          <tr><td colspan="3" class="empty">This folder is empty.</td></tr>
+          {{- end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="status-bar">
+    <p class="status-bar-field">{{ len .Data.Terms }} object(s)</p>
+    <p class="status-bar-field">{{ .Title }}</p>
+  </div>
+</section>
+{{ end }}

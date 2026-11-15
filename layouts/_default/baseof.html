@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Lang | default "en" }}">
+<head>
+  {{- partial "head.html" . }}
+</head>
+{{- $style := slice }}
+{{- with site.Params.desktopColor }}{{ $style = $style | append (printf "--desktop:%s" .) }}{{ end }}
+{{- with site.Params.wallpaper }}{{ $style = $style | append (printf "background-image:url('%s')" (. | relURL)) }}{{ end }}
+<body class="{{ if site.Params.readableProse }}prose-readable {{ end }}{{ if site.Params.wallpaper }}has-wallpaper{{ end }}"{{ with $style }} style="{{ delimit . ";" | safeCSS }}"{{ end }}>
+  <a class="skip-link" href="#main">Skip to content</a>
+  {{- partial "desktop-icons.html" . }}
+  <main id="main" class="desktop-main">
+    {{- block "main" . }}{{ end }}
+  </main>
+  {{- partial "taskbar.html" . }}
+  {{- $js := resources.Get "js/theme98.js" | minify | fingerprint }}
+  <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+</body>
+</html>

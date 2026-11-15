@@ -1,0 +1,61 @@
+baseURL = "https://example.org/"
+locale = "en-US"
+title = "My 98 Site"
+theme = "hugo-theme-98"
+themesDir = "../.."
+
+[pagination]
+  pagerSize = 10
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[params]
+  description = "A personal site that boots straight into the desktop."
+  style = "2000"              # "2000" (default) or "98"
+  mainSections = ["posts"]
+  dateFormat = "1/2/2006"
+  recentCount = 8
+  documentApp = "Notepad"     # shown in single-page title bars: "<title> - Notepad"
+  readableProse = true        # 12px article text instead of 11px
+  trayText = ""               # optional text next to the clock
+
+  # Background: the Windows 2000 blue (#3a6ea5) unless you change it.
+  # desktopColor = "#008080"            # any CSS colour
+  # wallpaper = "/images/wallpaper.jpg" # an image in static/images/, drawn over the colour
+
+  # iconFormat = "png"        # use your own static/icons/<name>-16.png / -32.png instead of the theme SVGs
+  # css98 = "/css/98.css"     # self-host 98.css (see README)
+
+[[menus.main]]
+  name = "My Computer"
+  pageRef = "/"
+  weight = 1
+  [menus.main.params]
+    icon = "computer"
+
+[[menus.main]]
+  name = "Posts"
+  pageRef = "/posts"
+  weight = 2
+  [menus.main.params]
+    icon = "folder"
+
+[[menus.main]]
+  name = "Tags"
+  pageRef = "/tags"
+  weight = 3
+  [menus.main.params]
+    icon = "folder"
+
+[[menus.main]]
+  name = "About"
+  pageRef = "/about"
+  weight = 4
+  [menus.main.params]
+    icon = "document"
+
+[markup.highlight]
+  style = "vs"
+  noClasses = true

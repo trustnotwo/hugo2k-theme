@@ -1,0 +1,11 @@
+{{- /* Returns the URL for an icon.
+       Usage: partial "icon-url.html" (dict "name" "folder" "size" 16)
+       Default: the theme's static/icons/<name>.svg (one file, any size).
+       With params.iconFormat = "png": static/icons/<name>-<size>.png (16 or 32),
+       which your site supplies in its own static/icons/ folder. */ -}}
+{{- $size := .size | default 16 }}
+{{- $url := printf "icons/%s.svg" .name }}
+{{- with site.Params.iconFormat }}
+  {{- if ne . "svg" }}{{ $url = printf "icons/%s-%d.%s" $.name $size . }}{{ end }}
+{{- end }}
+{{- return ($url | relURL) }}

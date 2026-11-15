@@ -1,0 +1,36 @@
+{{ define "main" }}
+<div class="window-stack home">
+  {{- $winTitle := site.Params.welcomeTitle | default (printf "Welcome to %s" site.Title) }}
+  <section class="window main-window" data-task="{{ site.Title }}" aria-label="{{ $winTitle }}">
+    {{ partial "titlebar.html" (dict "title" $winTitle "icon" "computer") }}
+    {{ partial "menu-bar.html" . }}
+    <div class="window-body">
+      <div class="document content">
+        {{- /* The heading comes from the home page's markdown (# Heading). welcomeHeading adds one from the config instead. */}}
+        {{- with site.Params.welcomeHeading }}<h1>{{ . }}</h1>{{ end }}
+        {{- with .Content }}{{ . }}{{ else }}{{ with site.Params.description }}<p>{{ . }}</p>{{ end }}{{ end }}
+      </div>
+    </div>
+  </section>
+
+  {{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+  {{- $recent := first (site.Params.recentCount | default 8) $pages }}
+  {{- with $recent }}
+  <section class="window" data-task="Recent Documents" aria-label="Recent Documents">
+    {{ partial "titlebar.html" (dict "title" "Recent Documents" "icon" "folder") }}
+    <div class="window-body">
+      {{ partial "file-table.html" . }}
+      {{- with site.GetPage (index site.Params.mainSections 0) }}
+      <div class="dialog-buttons align-end">
+        <a class="btn98" href="{{ .RelPermalink }}">View all…</a>
+      </div>
+      {{- end }}
+    </div>
+    <div class="status-bar">
+      <p class="status-bar-field">{{ len . }} object(s)</p>
+      <p class="status-bar-field">{{ len $pages }} total</p>
+    </div>
+  </section>
+  {{- end }}
+</div>
+{{ end }}

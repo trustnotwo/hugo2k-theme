@@ -1,0 +1,6 @@
+{{- /* {{< button href="/posts/" >}}Open{{< /button >}} */ -}}
+{{- with .Get "href" -}}
+<a class="btn98" href="{{ . | relURL }}">{{ $.Inner }}</a>
+{{- else -}}
+<button type="button">{{ .Inner }}</button>
+{{- end -}}

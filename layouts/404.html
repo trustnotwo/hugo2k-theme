@@ -1,0 +1,18 @@
+{{ define "main" }}
+<div class="window dialog" role="alertdialog" aria-labelledby="err-title" aria-describedby="err-desc" data-task="Error">
+  {{ partial "titlebar.html" (dict "title" site.Title "icon" "error" "dialog" true) }}
+  <div class="window-body">
+    <div class="dialog-row">
+      <img src="{{ partial "icon-url.html" (dict "name" "error" "size" 32) }}" alt="" width="32" height="32">
+      <div>
+        <p id="err-title"><strong>This page has performed an illegal operation and cannot be found.</strong></p>
+        <p id="err-desc">The file may have been moved, renamed or deleted. If the problem persists, contact the site administrator.</p>
+      </div>
+    </div>
+    <div class="dialog-buttons">
+      <a class="btn98" href="{{ "/" | relURL }}">OK</a>
+      <button type="button" onclick="history.back()">Go Back</button>
+    </div>
+  </div>
+</div>
+{{ end }}

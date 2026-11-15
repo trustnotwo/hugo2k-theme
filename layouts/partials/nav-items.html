@@ -1,0 +1,14 @@
+{{- /* Returns a list of {name, url, icon} used by the desktop icons, Start menu and menu bars.
+       Uses the "main" menu when configured, otherwise falls back to Home + top-level sections. */ -}}
+{{- $items := slice }}
+{{- with site.Menus.main }}
+  {{- range . }}
+    {{- $items = $items | append (dict "name" .Name "url" .URL "icon" (.Params.icon | default "folder")) }}
+  {{- end }}
+{{- else }}
+  {{- $items = $items | append (dict "name" "My Computer" "url" ("/" | relURL) "icon" "computer") }}
+  {{- range site.Sections }}
+    {{- $items = $items | append (dict "name" .Title "url" .RelPermalink "icon" "folder") }}
+  {{- end }}
+{{- end }}
+{{- return $items }}

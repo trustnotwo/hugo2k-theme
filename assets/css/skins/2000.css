@@ -1,0 +1,73 @@
+/* Windows 2000 skin: warmer gray, Tahoma, deeper blue titles, steel-blue desktop. */
+:root {
+  --desktop: #3a6ea5;
+  --face: #d4d0c8;
+  --light: #d4d0c8;
+  --white: #fff;
+  --shadow: #808080;
+  --dark: #404040;
+  --highlight: #0a246a;
+  --title-a: #0a246a;
+  --title-b: #a6caf0;
+  --title-inactive-a: #808080;
+  --title-inactive-b: #c0c0c0;
+  --banner-a: #0a246a;
+  --banner-b: #000;
+  --text: #000;
+  --font: Tahoma, "Segoe UI", Verdana, Arial, sans-serif;
+  --font-smoothing: auto;
+  --prose-size: 12px;
+}
+.prose-readable { --prose-size: 13px; }
+
+.title-bar-text { font-size: 11px; }
+
+/* Menu bars hot-track with a thin raised border instead of a blue fill */
+.menu-bar a:hover {
+  background: none;
+  color: var(--text);
+  box-shadow: inset -1px -1px var(--shadow), inset 1px 1px var(--white);
+}
+.menu-bar a:focus { background: var(--highlight); color: var(--highlight-text); box-shadow: none; }
+
+/* Start menu banner: dark-to-black, text set at the bottom like the original */
+.start-menu-banner span { font-family: Tahoma, Arial, sans-serif; font-size: 15px; letter-spacing: 0; }
+
+/* ---------- Explorer "Web view" side panel ---------- */
+.explorer-pane {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  background: #fff;
+  box-shadow: var(--sunken);
+  padding: 2px;
+}
+.explorer-pane .file-table { box-shadow: none; padding: 0; }
+.webview {
+  padding: 14px 16px;
+  border-right: 1px solid #e4e2dc;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+.webview img { width: 32px; height: 32px; }
+.webview h2 {
+  margin: 6px 0 6px;
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+.webview-rule {
+  height: 3px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #0a246a, #a6caf0 70%, transparent);
+}
+.webview .content { font-size: 11px; line-height: 1.5; }
+.webview .content p { margin: 0 0 .8em; }
+.webview-count { color: #555; margin: 0; }
+
+@media (max-width: 720px) {
+  .explorer-pane { grid-template-columns: minmax(0, 1fr); }
+  .webview { border-right: 0; border-bottom: 1px solid #e4e2dc; padding: 10px 12px; }
+  .webview img, .webview-count { display: none; }
+  .webview h2 { margin-top: 0; font-size: 16px; }
+}

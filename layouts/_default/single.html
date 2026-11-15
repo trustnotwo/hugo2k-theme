@@ -1,0 +1,57 @@
+{{ define "main" }}
+{{- $fmt := site.Params.dateFormat | default "1/2/2006" }}
+{{- $toc := and .Params.toc (gt (len .TableOfContents) 32) }}
+<article class="window main-window doc-window{{ if $toc }} has-toc{{ end }}" data-task="{{ .Title }}" aria-labelledby="page-title">
+  {{ partial "titlebar.html" (dict "title" (printf "%s - %s" .Title (.Params.app | default site.Params.documentApp | default "Notepad")) "icon" (.Params.icon | default "document")) }}
+  {{ partial "menu-bar.html" . }}
+  <div class="window-body">
+    <div class="doc-layout">
+    {{- if $toc }}
+    <details class="toc-pane" open>
+      <summary>Contents</summary>
+      {{ .TableOfContents }}
+    </details>
+    {{- end }}
+    <div class="document">
+    <div class="content doc-column">
+      <header class="doc-header">
+        <h1 id="page-title">{{ .Title }}</h1>
+        {{- if and (not .Date.IsZero) (ne .Params.showDate false) }}
+        <p class="doc-meta">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format $fmt }}</time>
+          {{- with .Params.author }} · {{ . }}{{ end }}
+        </p>
+        {{- end }}
+      </header>
+
+      {{ .Content }}
+    </div>
+    </div>
+    </div>
+
+    {{- $tags := .GetTerms "tags" }}
+    {{- $cats := .GetTerms "categories" }}
+    {{- if or $tags $cats }}
+    <fieldset class="terms">
+      <legend>Filed under</legend>
+      <div class="tag-list">
+        {{- range $cats }}<a class="btn98 small" href="{{ .RelPermalink }}"><img src="{{ partial "icon-url.html" (dict "name" "folder" "size" 16) }}" alt="" width="16" height="16">{{ .LinkTitle }}</a>{{ end }}
+        {{- range $tags }}<a class="btn98 small" href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a>{{ end }}
+      </div>
+    </fieldset>
+    {{- end }}
+
+    {{- if and .IsPage (or .PrevInSection .NextInSection) }}
+    <nav class="post-nav" aria-label="More posts">
+      {{- with .PrevInSection }}<a class="btn98" href="{{ .RelPermalink }}" rel="prev">&laquo; <span>{{ .LinkTitle }}</span></a>{{ else }}<span></span>{{ end }}
+      {{- with .NextInSection }}<a class="btn98" href="{{ .RelPermalink }}" rel="next"><span>{{ .LinkTitle }}</span> &raquo;</a>{{ end }}
+    </nav>
+    {{- end }}
+  </div>
+  <div class="status-bar">
+    <p class="status-bar-field">{{ .WordCount }} words</p>
+    <p class="status-bar-field">{{ .ReadingTime }} min read</p>
+    <p class="status-bar-field">{{ if not .Lastmod.IsZero }}Modified {{ .Lastmod.Format $fmt }}{{ end }}</p>
+  </div>
+</article>
+{{ end }}

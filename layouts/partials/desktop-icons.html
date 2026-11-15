@@ -1,0 +1,9 @@
+<nav class="desktop-icons" aria-label="Desktop">
+  {{- $here := .RelPermalink }}
+  {{- range partialCached "nav-items.html" . "nav" }}
+  <a class="desktop-icon{{ if eq .url $here }} is-current{{ end }}" href="{{ .url }}">
+    <img src="{{ partial "icon-url.html" (dict "name" .icon "size" 32) }}" alt="" width="32" height="32">
+    <span>{{ .name }}</span>
+  </a>
+  {{- end }}
+</nav>

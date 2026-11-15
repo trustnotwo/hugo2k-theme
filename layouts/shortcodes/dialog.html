@@ -1,0 +1,14 @@
+{{- /* {{< dialog type="info|warning|error" title="Notice" >}}Message{{< /dialog >}} */ -}}
+{{- $type := .Get "type" | default "info" }}
+<div class="window dialog shortcode-window" role="note">
+  {{ partial "titlebar.html" (dict "title" (.Get "title" | default (humanize $type)) "icon" $type "dialog" true) }}
+  <div class="window-body">
+    <div class="dialog-row">
+      <img src="{{ partial "icon-url.html" (dict "name" $type "size" 32) }}" alt="{{ humanize $type }}" width="32" height="32">
+      <div>{{ .Inner | .Page.RenderString (dict "display" "block") }}</div>
+    </div>
+    {{- with .Get "button" }}
+    <div class="dialog-buttons"><button type="button" data-dismiss>{{ . }}</button></div>
+    {{- end }}
+  </div>
+</div>

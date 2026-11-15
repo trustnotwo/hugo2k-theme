@@ -26,6 +26,7 @@ themesDir = "../.."
   # desktopColor = "#008080"            # any CSS colour
   # wallpaper = "/images/wallpaper.jpg" # an image in static/images/, drawn over the colour
   # wallpaperName = "My Photo"          # its name in Display Properties (default: the file name)
+  # wallpaperPosition = "tile"          # stretch (default), center or tile
   # themeWallpapers = false             # hide the theme's seamless tiles from Display Properties
 
   # Dark mode: visitors whose system is set to dark get these until they pick a look themselves.

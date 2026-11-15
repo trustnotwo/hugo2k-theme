@@ -64,6 +64,7 @@ The desktop is the stock Windows 2000 blue (`#3a6ea5`). To change it:
   desktopColor = "#008080"              # any CSS colour (this one is the Windows 98 teal)
   wallpaper = "/images/wallpaper.jpg"   # optional image, from static/images/
   wallpaperName = "Beach"               # its name in Display Properties (default: the file name)
+  wallpaperPosition = "tile"            # stretch (default), center or tile
 ```
 
 A wallpaper covers the screen on top of the colour. The icon labels get a drop shadow so they stay
@@ -181,6 +182,7 @@ All three open from the Start menu (and the desktop's right-click menu) as norma
 | `darkWallpaper` / `darkWallpaperPosition` | none | Wallpaper (and stretch/center/tile) `autoDark` uses |
 | `desktopColor` | `#3a6ea5` (98: `#008080`) | Desktop background colour |
 | `wallpaper` / `wallpaperName` | none | Background image URL and its name in Display Properties |
+| `wallpaperPosition` | stretch | How `wallpaper` is shown: `stretch`, `center` or `tile` |
 | `wallpapers` | none | List of `{name, url, tile, size}` offered in Display Properties |
 | `themeWallpapers` | `true` | Offer the theme's tiles in Display Properties |
 | `welcomeTitle` | `Welcome to <title>` | Home window title bar |

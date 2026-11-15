@@ -59,6 +59,7 @@
       "darkStyle" (site.Params.darkStyle | default "dark")
       "darkWallpaper" (cond (isset site.Params "darkwallpaper") (site.Params.darkWallpaper | relURL) "")
       "darkWallpaperPosition" (site.Params.darkWallpaperPosition | default "")
+      "wallpaperPosition" (site.Params.wallpaperPosition | default "")
       "iconSets" $iconSets
       "skinBase" ("skins/" | relURL)
       "desktopColor" (site.Params.desktopColor | default "")
@@ -94,7 +95,7 @@
     },
     // The wallpaper and picture position used when the visitor hasn't chosen one.
     defaultWallpaper: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaper : cfg.wallpaper; },
-    defaultPosition: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaperPosition : ''; },
+    defaultPosition: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaperPosition : cfg.wallpaperPosition; },
     // Background image URL for a prefs object ('' = none).
     wallpaperUrl: function (p) {
       if (!('wallpaper' in p)) return T.defaultWallpaper(p);
@@ -125,6 +126,8 @@
       var pos = 'position' in p ? p.position : ('wallpaper' in p ? '' : T.defaultPosition(p));
       if (p.color) r.push(':root,body{--desktop:' + p.color + ' !important}');
       if ('wallpaper' in p || u !== cfg.wallpaper) r.push('body{background-image:' + (u ? 'url("' + u + '")' : 'none') + ' !important}');
+      // Stretch chosen over a site default of center/tile (which the page's own style sets)
+      if (!pos && cfg.wallpaperPosition) r.push('body{background-size:cover !important;background-repeat:no-repeat !important;background-position:center !important}');
       if (pos === 'center') r.push('body{background-size:auto !important;background-repeat:no-repeat !important}');
       if (pos === 'tile') r.push('body{background-size:auto !important;background-repeat:repeat !important;background-position:0 0 !important}');
       var st = document.getElementById('desktop-prefs');

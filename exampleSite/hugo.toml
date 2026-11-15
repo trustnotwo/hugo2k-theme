@@ -25,7 +25,8 @@ themesDir = "../.."
   # desktopColor = "#008080"            # any CSS colour
   # wallpaper = "/images/wallpaper.jpg" # an image in static/images/, drawn over the colour
 
-  # iconFormat = "png"        # use your own static/icons/<name>-16.png / -32.png instead of the theme SVGs
+  # Icons: the theme ships the SE98 set. Put a file with the same name in static/icons/ to replace one.
+  # iconFormat = "svg"        # use your own static/icons/<name>.svg instead of PNGs
   # css98 = "/css/98.css"     # self-host 98.css (see README)
 
 [[menus.main]]
@@ -40,21 +41,21 @@ themesDir = "../.."
   pageRef = "/posts"
   weight = 2
   [menus.main.params]
-    icon = "folder"
+    icon = "my-documents"
 
 [[menus.main]]
   name = "Tags"
   pageRef = "/tags"
   weight = 3
   [menus.main.params]
-    icon = "folder"
+    icon = "search"
 
 [[menus.main]]
   name = "About"
   pageRef = "/about"
   weight = 4
   [menus.main.params]
-    icon = "document"
+    icon = "notepad"
 
 [markup.highlight]
   style = "vs"

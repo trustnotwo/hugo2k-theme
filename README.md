@@ -76,8 +76,10 @@ Both come from the `main` menu. `params.icon` picks the icon:
     icon = "folder"
 ```
 
-Built-in icons are `computer`, `folder`, `folder-open`, `document`, `internet-document`, `info`,
-`warning`, `error` and `start`.
+Built-in icons (from the [SE98](#icons-and-licensing) set): `computer`, `my-documents`, `folder`,
+`folder-open`, `document`, `notepad`, `internet`, `internet-document`, `network`, `recycle-bin`,
+`programs`, `settings`, `search`, `run`, `help`, `shut-down`, `start`, `favorites`, `image`, `zip`,
+`info`, `warning` and `error`.
 
 ### Home page and sections
 
@@ -96,9 +98,9 @@ Built-in icons are `computer`, `folder`, `folder-open`, `document`, `internet-do
 
 ### Your own icons
 
-To use your own PNG icons, set `iconFormat = "png"` and put a 16×16 and a 32×32 file for each name in
-your site's `static/icons/`, for example `folder-16.png` and `folder-32.png`. Only publish icons you're
-allowed to share: original Windows icons are Microsoft artwork.
+Each icon is a 16×16 and a 32×32 PNG named `<name>-16.png` and `<name>-32.png`. To replace one, or add a
+new name for a menu entry, put files with that name in your site's `static/icons/`. Your site's files
+win over the theme's. To use SVGs instead, set `iconFormat = "svg"` and supply `static/icons/<name>.svg`.
 
 ## All parameters
 
@@ -115,7 +117,7 @@ allowed to share: original Windows icons are Microsoft artwork.
 | `dateFormat` | `1/2/2006` | Go date layout |
 | `documentApp` | `Notepad` | Title-bar suffix on pages (`Title - Notepad`); per page with `app:` |
 | `readableProse` | `false` | Slightly larger article text |
-| `iconFormat` | `svg` | `png` = your own icons from `static/icons/` |
+| `iconFormat` | `png` | `svg` = your own SVG icons from `static/icons/` |
 | `startLabel` / `startBanner` | `Start` / site title | Start button label and the Start menu's side banner |
 | `trayText` | none | Text next to the clock |
 | `favicon` | computer icon | Favicon path |
@@ -157,6 +159,15 @@ Grouped content.
 - **Self-hosting 98.css:** copy `98.css` and its `ms_sans_serif*.woff`/`.woff2` fonts from the npm
   package's `dist/` folder into `static/css/`, then set `css98 = "/css/98.css"`.
 
-## License
+## Icons and licensing
 
-MIT. 98.css is © Jordan Scales, also MIT, and is loaded from its CDN rather than bundled.
+The theme's code is MIT (see [`LICENSE`](LICENSE)).
+
+The icons in `static/icons/` come from **SE98** by nestoris ([github.com/nestoris/Win98SE](https://github.com/nestoris/Win98SE)),
+a Windows 98 SE-style icon theme based on [Chicago95](https://github.com/grassmunk/Chicago95). They're
+licensed separately under the **GNU GPL v2**, with the full text in [`static/icons/LICENSE`](static/icons/LICENSE).
+If you redistribute the icons, the GPL applies to them. A few are recreations of Microsoft designs
+and trademarks (for example the Windows flag on `start` and the Internet Explorer logo on `internet`).
+Replace those if that matters for your site.
+
+[98.css](https://github.com/jdan/98.css) is © Jordan Scales, MIT, and is loaded from its CDN rather than bundled.

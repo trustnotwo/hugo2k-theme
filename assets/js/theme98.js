@@ -880,6 +880,7 @@
           '<li role="tab"><a href="#ap">Appearance</a></li>' +
           '<li role="tab"><a href="#fx">Effects</a></li>' +
         '</menu>' +
+        '<div class="dp-pages">' +
         '<div class="window dp-panel" role="tabpanel" data-tab="bg">' +
           '<div class="dp-monitor" aria-hidden="true"><div class="dp-screen"></div></div>' +
           '<label for="' + id + '-wp">Select a picture for the desktop background:</label>' +
@@ -899,7 +900,7 @@
           '</div>' +
           '<p class="dp-note" role="status"></p>' +
         '</div>' +
-        '<div class="window dp-panel" role="tabpanel" data-tab="ap" hidden>' +
+        '<div class="window dp-panel is-off" role="tabpanel" data-tab="ap" inert>' +
           '<div class="dp-preview" aria-hidden="true">' +
             '<div class="dp-mini inactive"><div class="dp-mini-title"><span>Inactive Window</span><span class="dp-mini-btns"><i class="min"></i><i class="max"></i><i class="close"></i></span></div></div>' +
             '<div class="dp-mini active"><div class="dp-mini-title"><span>Active Window</span><span class="dp-mini-btns"><i class="min"></i><i class="max"></i><i class="close"></i></span></div><div class="dp-mini-body">Window Text</div></div>' +
@@ -911,12 +912,13 @@
           '<div class="field-row-stacked"><label for="' + id + '-fs">Font size:</label>' +
             '<select id="' + id + '-fs" class="dp-size"><option value="normal">Normal</option><option value="large">Large</option></select></div>' +
         '</div>' +
-        '<div class="window dp-panel" role="tabpanel" data-tab="fx" hidden>' +
+        '<div class="window dp-panel is-off" role="tabpanel" data-tab="fx" inert>' +
           '<fieldset><legend>Visual effects</legend>' +
             '<div class="field-row"><input type="checkbox" id="' + id + '-anim" class="dp-anim"><label for="' + id + '-anim">Use transition effects when minimizing and restoring windows</label></div>' +
             '<div class="field-row"><input type="checkbox" id="' + id + '-big" class="dp-big"><label for="' + id + '-big">Use large icons</label></div>' +
           '</fieldset>' +
           '<p class="dp-note">Settings are saved in this browser only.</p>' +
+        '</div>' +
         '</div>' +
         '<div class="dp-buttons">' +
           '<button type="button" data-act="defaults">Defaults</button>' +
@@ -1026,7 +1028,10 @@
         t.setAttribute('aria-selected', t.querySelector('a').hash === '#' + name ? 'true' : 'false');
       });
       Array.prototype.forEach.call(win.querySelectorAll('.dp-panel'), function (p) {
-        p.hidden = p.getAttribute('data-tab') !== name;
+        // Hidden pages keep their space (visibility, not display) so every tab is as tall as the tallest
+        var off = p.getAttribute('data-tab') !== name;
+        p.classList.toggle('is-off', off);
+        if (off) p.setAttribute('inert', ''); else p.removeAttribute('inert');
       });
     }
     win.querySelector('.dp-tabs').addEventListener('click', function (e) {

@@ -165,7 +165,9 @@ table > thead > tr > * { background: linear-gradient(180deg, #fff, #f1f1f1 80%, 
 .start-button:hover, .start-menu-wrap[open] > .start-button { border-image-source: var(--xp-start-hover); }
 .start-button img { width: 20px; height: 20px; }
 .taskbar-divider { display: none; }
-.taskbar-tasks { padding: 2px 6px; gap: 3px; }
+/* Zune's and Royale Noir's button images fill their box, so the buttons get 2px of room; the other looks' images carry
+   their own 3px margin, so they set --xp-tasks-pad: 0 6px. */
+.taskbar-tasks { padding: var(--xp-tasks-pad, 2px 6px); gap: 3px; }
 .task-button {
   border: 0;
   border-image: var(--xp-task) 4 fill / 4px stretch;

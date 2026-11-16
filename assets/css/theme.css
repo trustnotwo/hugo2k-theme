@@ -875,8 +875,11 @@ html.js .start-menu .separator.js-only { display: block !important; }
 /* Display Properties */
 .app-dialog > .window-body { padding: 6px 8px 8px; }
 .dp-tabs { margin: 0; }
-.dp-panel { padding: 12px; min-height: 300px; }
-.dp-panel[hidden] { display: none; }
+/* The three tab pages sit on top of each other, so the dialog is as tall as the tallest and never changes height */
+.dp-pages { display: grid; }
+.dp-pages > .dp-panel { grid-area: 1 / 1; }
+.dp-panel { padding: 12px; }
+.dp-panel.is-off { visibility: hidden; }
 .dp-panel label { display: block; margin-bottom: 4px; }
 .dp-panel .field-row label, .dp-panel .field-row-stacked label { display: inline; margin: 0; }
 .dp-monitor {

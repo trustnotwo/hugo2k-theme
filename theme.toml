@@ -1,9 +1,9 @@
 name = "hugo2k"
 license = "MIT"
 licenselink = "https://github.com/trustnotwo/hugo2k-theme/blob/main/LICENSE"
-description = "A Windows 2000 desktop theme built on 98.css: draggable windows, an Explorer file list, a Start menu and taskbar, built-in Search and Command Prompt, and switchable looks (Windows 98, dark, Windows XP Zune and Royale Noir). Bundled images are GPL (see README)."
+description = "A Windows 2000 desktop theme built on 98.css: draggable windows, an Explorer file list, a Start menu and taskbar, built-in Search, Command Prompt and two games, and switchable looks (Windows 98, dark, and six Windows XP looks). Bundled images are GPL (see README)."
 homepage = "https://github.com/trustnotwo/hugo2k-theme"
-tags = ["retro", "blog", "minimal", "dark", "windows-98", "windows-2000", "windows-xp", "98.css"]
+tags = ["retro", "blog", "minimal", "dark", "windows-98", "windows-2000", "windows-xp", "games", "98.css"]
 features = ["blog", "taxonomies", "pagination", "rss", "shortcodes", "responsive", "search", "dark mode"]
 min_version = "0.170.0"
 

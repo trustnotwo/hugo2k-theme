@@ -1,6 +1,7 @@
 /* Windows XP-style window chrome built from real theme images (static/skins/<theme>/, GPL-3.0,
-   from the B00merang Project's windows-xp themes). The theme file (zune.css, royale-noir.css)
-   supplies the colours and the --xp-* image URLs; this file lays them out. */
+   from the B00merang Project's windows-xp themes). The theme file (zune.css, luna.css ...) supplies the
+   colours, the --xp-* image URLs and, where they differ from Zune's, the sizes (--xp-bw frame width,
+   --xp-th title height, --xp-cap title corner width, --xp-radius) and text colours; this file lays them out. */
 :root {
   --font: Tahoma, "Segoe UI", Verdana, Arial, sans-serif;
   --font-smoothing: auto;
@@ -19,45 +20,56 @@ body { font-size: 11px; }
 .window:not([role=tabpanel]) {
   padding: 0 0 3px;
   border: solid transparent;
-  border-width: 0 4px 4px;
-  border-image: var(--xp-frame) 0 4 4 4 / 0 4px 4px 4px;
-  border-radius: 7px 7px 0 0;
+  border-width: 0 var(--xp-bw, 4px) var(--xp-bw, 4px);
+  border-image: var(--xp-frame) 0 var(--xp-bwn, 4) var(--xp-bwn, 4) var(--xp-bwn, 4) / 0 var(--xp-bw, 4px) var(--xp-bw, 4px) var(--xp-bw, 4px);
+  border-radius: var(--xp-radius, 7px) var(--xp-radius, 7px) 0 0;
   /* Border images ignore border-radius, so the frame's side strips would show through the title bar's
      see-through corner pixels. Clipping the whole window to the rounded shape keeps the corners round. */
-  clip-path: inset(0 round 7px 7px 0 0);
+  clip-path: inset(0 round var(--xp-radius, 7px) var(--xp-radius, 7px) 0 0);
   box-shadow: none;
   background: var(--face);
 }
+.window:not([role=tabpanel]):has(> .title-bar.inactive) { border-image-source: var(--xp-frame-inactive, var(--xp-frame)); }
 .window.is-maximized { border-width: 0; padding-bottom: 0; border-radius: 0; clip-path: none; }
 
 .title-bar,
 .title-bar.inactive {
-  height: 30px;
-  margin: 0 -4px;
+  height: var(--xp-th, 30px);
+  margin: 0 calc(-1 * var(--xp-bw, 4px));
   padding: 0 5px 0 9px;
   background:
-    var(--xp-title-left) left top / 7px 30px no-repeat,
-    var(--xp-title-right) right top / 7px 30px no-repeat,
-    var(--xp-title-middle) 7px 0 / calc(100% - 14px) 30px no-repeat;
+    var(--xp-title-left) left top / var(--xp-cap, 7px) var(--xp-th, 30px) no-repeat,
+    var(--xp-title-right) right top / var(--xp-cap, 7px) var(--xp-th, 30px) no-repeat,
+    var(--xp-title-middle) var(--xp-cap, 7px) 0 / calc(100% - 2 * var(--xp-cap, 7px)) var(--xp-th, 30px) no-repeat;
+}
+/* Inactive: the theme's own unfocused title images where it has them, else the active ones, washed out */
+.title-bar.inactive {
+  background:
+    var(--xp-title-left-inactive, var(--xp-title-left)) left top / var(--xp-cap, 7px) var(--xp-th, 30px) no-repeat,
+    var(--xp-title-right-inactive, var(--xp-title-right)) right top / var(--xp-cap, 7px) var(--xp-th, 30px) no-repeat,
+    var(--xp-title-middle-inactive, var(--xp-title-middle)) var(--xp-cap, 7px) 0 / calc(100% - 2 * var(--xp-cap, 7px)) var(--xp-th, 30px) no-repeat;
 }
 .title-bar { position: relative; }
-.title-bar.inactive::after {   /* inactive windows: same chrome, washed out */
+.title-bar.inactive::after {
   content: "";
   position: absolute;
   inset: 0 1px 0;
-  border-radius: 6px 6px 0 0;
-  background: var(--xp-inactive-wash);
+  border-radius: var(--xp-radius, 7px) var(--xp-radius, 7px) 0 0;
+  background: var(--xp-inactive-wash, transparent);
   pointer-events: none;
 }
-.title-bar.inactive .title-bar-controls { opacity: .75; }
+.title-bar.inactive .title-bar-controls { opacity: var(--xp-inactive-btn-opacity, .75); }
 .title-bar.inactive .title-bar-controls:hover { opacity: 1; }
 .is-maximized > .title-bar { margin: 0; }
 .title-bar-text {
-  color: #fff;
+  color: var(--xp-title-text, #fff);
   font: bold 13px "Trebuchet MS", Tahoma, sans-serif;
-  text-shadow: 1px 1px 1px #000;
+  text-shadow: var(--xp-title-shadow, 1px 1px 1px #000);
 }
-.title-bar.inactive .title-bar-text { color: var(--xp-title-inactive-text); }
+.title-bar.inactive .title-bar-text {
+  color: var(--xp-title-inactive-text);
+  text-shadow: var(--xp-title-inactive-shadow, var(--xp-title-shadow, 1px 1px 1px #000));
+}
 
 /* Buttons sit 4px from the top like the original theme: centring a 21px button in a 30px bar puts it
    on a half pixel and blurs it. Drawn pixel-sharp at any display scaling. */
@@ -101,6 +113,11 @@ body { font-size: 11px; }
 .title-bar-controls button[aria-label=Close] { background-image: var(--xp-close); }
 .title-bar-controls button[aria-label=Close]:hover { background-image: var(--xp-close-hover); }
 .title-bar-controls button[aria-label=Close]:active { background-image: var(--xp-close-active); }
+/* Unfocused windows use the theme's unfocused buttons where it has them */
+.title-bar.inactive .title-bar-controls button[aria-label=Minimize]:not(:hover):not(:active) { background-image: var(--xp-minimize-unfocused, var(--xp-minimize)); }
+.title-bar.inactive .title-bar-controls button[aria-label=Maximize]:not(:hover):not(:active) { background-image: var(--xp-maximize-unfocused, var(--xp-maximize)); }
+.title-bar.inactive .title-bar-controls button[aria-label=Restore]:not(:hover):not(:active) { background-image: var(--xp-unmaximize-unfocused, var(--xp-unmaximize)); }
+.title-bar.inactive .title-bar-controls button[aria-label=Close]:not(:hover):not(:active) { background-image: var(--xp-close-unfocused, var(--xp-close)); }
 
 /* ---------- Push buttons (and link buttons) ---------- */
 button, input[type=reset], input[type=submit], .btn98 {
@@ -140,7 +157,7 @@ table > thead > tr > * { background: linear-gradient(180deg, #fff, #f1f1f1 80%, 
   border-image: var(--xp-start) 0 14 0 0 fill / 0 14px 0 0 stretch;
   background: none;
   box-shadow: none;
-  color: #fff;
+  color: var(--xp-start-text, #fff);
   font: italic bold 17px/1 "Trebuchet MS", Tahoma, sans-serif;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .7);
   text-transform: lowercase;
@@ -154,18 +171,19 @@ table > thead > tr > * { background: linear-gradient(180deg, #fff, #f1f1f1 80%, 
   border-image: var(--xp-task) 4 fill / 4px stretch;
   background: none;
   box-shadow: none;
-  color: #fff;
-  text-shadow: 1px 1px 1px #000;
+  color: var(--xp-task-text, #fff);
+  text-shadow: var(--xp-task-shadow, 1px 1px 1px #000);
 }
 .task-button:hover { border-image-source: var(--xp-task-hover); }
-.task-button.is-pressed { border-image-source: var(--xp-task-active); background: none; box-shadow: none; }
+.task-button.is-pressed { border-image-source: var(--xp-task-active); background: none; box-shadow: none; color: var(--xp-task-text-active, var(--xp-task-text, #fff)); }
 .tray {
   padding: 0 12px 0 16px;
   border: 0;
   border-image: var(--xp-tray) 0 0 0 10 fill / 0 0 0 10px stretch;
   background: none;
   box-shadow: none;
-  color: #fff;
+  color: var(--xp-tray-text, #fff);
+  text-shadow: var(--xp-tray-shadow, none);
 }
 
 /* ---------- Start menu ---------- */
@@ -173,7 +191,7 @@ table > thead > tr > * { background: linear-gradient(180deg, #fff, #f1f1f1 80%, 
   flex-direction: column;
   min-width: 270px;
   padding: 0;
-  border: 1px solid #000;
+  border: 1px solid var(--xp-menu-border, #000);
   border-radius: 6px 6px 0 0;
   background: var(--xp-menu-bg);
   box-shadow: 2px 2px 8px rgba(0, 0, 0, .55);
@@ -181,12 +199,12 @@ table > thead > tr > * { background: linear-gradient(180deg, #fff, #f1f1f1 80%, 
 }
 .start-menu::after {
   content: "";
-  height: 34px;
+  height: var(--xp-menu-bottom-h, 34px);
   background: var(--xp-menu-bottom) center / 100% 100% no-repeat;
 }
 .start-menu-banner {
   width: auto;
-  height: 54px;
+  height: var(--xp-menu-top-h, 54px);
   padding: 0 14px;
   align-items: center;
   justify-content: flex-start;
@@ -195,14 +213,14 @@ table > thead > tr > * { background: linear-gradient(180deg, #fff, #f1f1f1 80%, 
 .start-menu-banner span {
   writing-mode: horizontal-tb;
   transform: none;
-  color: #fff;
+  color: var(--xp-banner-text, #fff);
   font: bold 15px Tahoma, sans-serif;
-  text-shadow: 1px 1px 2px #000;
+  text-shadow: var(--xp-banner-shadow, 1px 1px 2px #000);
 }
 .start-menu ul { padding: 6px 4px; }
-.start-menu a { color: #fff; }
+.start-menu a { color: var(--xp-menu-text, #fff); }
 .start-menu a:hover, .start-menu a:focus { background: var(--highlight); color: var(--highlight-text); }
-.start-menu .separator { border-top-color: rgba(255, 255, 255, .15); border-bottom-color: rgba(0, 0, 0, .4); }
+.start-menu .separator { border-top-color: var(--xp-menu-sep-a, rgba(255, 255, 255, .15)); border-bottom-color: var(--xp-menu-sep-b, rgba(0, 0, 0, .4)); }
 
 /* ---------- Context menu: the light GTK menu ---------- */
 .ctx-menu { background: #f0f0f0; box-shadow: inset 0 0 0 1px #979797, 2px 2px 4px rgba(0, 0, 0, .35); }

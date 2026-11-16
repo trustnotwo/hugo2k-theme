@@ -2,7 +2,7 @@
 
 A retro desktop theme for [Hugo](https://gohugo.io/) in the style of Windows 2000, built on
 [98.css](https://github.com/jdan/98.css) by Jordan Scales. Visitors can switch it to Windows 98, a dark
-Windows 2000, or the Windows XP Zune and Royale Noir looks.
+Windows 2000, or one of six Windows XP looks (Luna, Royale, Homestead, Metallic, Zune and Royale Noir).
 
 - Every page opens in a window. You can drag it by the title bar, resize it from the edges, and
   minimize it to the taskbar, maximize it or close it.
@@ -11,6 +11,7 @@ Windows 2000, or the Windows XP Zune and Royale Noir looks.
   window and a clock.
 - Built-in programs in the Start menu: **Search** (searches every page), **Command Prompt** (a DOS-style
   shell for getting around the site) and **Settings** (Display Properties: look, wallpaper, colours, font size).
+- Two small games in the Start menu: **Minefield** (a mine-clearing puzzle) and **Pairs** (card matching).
 - Right-click the desktop for Arrange Icons, Refresh and Properties.
 - Optional dark mode for visitors whose system is set to dark.
 - Pages can have a contents pane, tags, previous/next links and a status bar.
@@ -91,6 +92,13 @@ To offer more pictures, list them all (this replaces `wallpaper` in the list):
 The theme's own tiles (from `data/wallpapers.yaml`) are listed after yours; set `themeWallpapers = false`
 to hide them.
 
+A look can start with its own wallpaper (until the visitor picks one) by listing it by look id:
+
+```toml
+[params.lookWallpapers]
+  luna = "/images/hills.webp"
+```
+
 ### Looks and dark mode
 
 `style` picks the look every visitor starts with. Visitors can change it in
@@ -101,6 +109,10 @@ to hide them.
 | `2000` (default) | Windows 2000 |
 | `dark` | Windows 2000 with dark windows (a low-glare scheme, not a real Windows one) |
 | `98` | Windows 98 (no Explorer side panel) |
+| `luna` | Windows XP Luna: the classic blue |
+| `royale` | Windows XP Royale (Media Center blue) |
+| `homestead` | Windows XP Homestead: olive green |
+| `metallic` | Windows XP Metallic: silver |
 | `zune` | Windows XP Zune: black chrome with orange accents |
 | `royale-noir` | Windows XP Royale Noir: blue-black chrome |
 | `zune-dark`, `royale-noir-dark` | The XP looks with dark window insides |
@@ -160,9 +172,10 @@ new name for a menu entry, put files with that name in your site's `static/icons
 win over the theme's. To use SVGs instead, set `iconFormat = "svg"` and supply `static/icons/<name>.svg`.
 The XP looks use `static/skins/xp-icons/` for the names it has and fall back to `static/icons/` for the rest.
 
-## The built-in programs
+## The built-in programs and games
 
-All three open from the Start menu (and the desktop's right-click menu) as normal windows.
+The programs open from the Start menu (Display Properties, Search and Command Prompt also from the desktop's
+right-click menu) as normal windows.
 
 - **Search** looks through every page's title, tags and text. Hugo builds a small JSON index of your
   published pages with the site, so no server is needed. Drafts are never included.
@@ -171,6 +184,11 @@ All three open from the Start menu (and the desktop's right-click menu) as norma
   `search`, `color`, `title`, `cls`, `ver` and `exit` work too. Up/Down recall commands; Tab completes names.
 - **Display Properties** has Background (wallpaper, position, colour, Browse... for a visitor's own
   picture), Appearance (look and font size, with a preview) and Effects (window animations, large icons).
+- **Minefield** is a mine-clearing puzzle with three levels. Click opens a square, right-click (or F, or a
+  long-press on a touch screen, or the Flag mode box) plants a flag, and clicking a number whose flags add
+  up opens its neighbours. The first click is always safe; arrow keys and Space work too.
+- **Pairs** is a card-matching game using the theme's icons, with three levels.
+- Both keep a best time or score per level in the visitor's browser. Set `games = false` to remove them.
 
 ## All parameters
 
@@ -191,6 +209,8 @@ All three open from the Start menu (and the desktop's right-click menu) as norma
 | `mainSections` | auto | Sections in "Recent Documents" |
 | `recentCount` | `8` | Number of recent pages on the home page |
 | `hideEmptySections` | `true` | Hide menu entries for sections with no pages |
+| `games` | `true` | Show Minefield and Pairs in the Start menu |
+| `lookWallpapers` | none | Wallpaper a look starts with, by look id (see [Background](#background)) |
 | `dateFormat` | `1/2/2006` | Go date layout |
 | `documentApp` | `Notepad` | Title-bar suffix on pages (`Title - Notepad`); per page with `app:` |
 | `readableProse` | `false` | Slightly larger article text |
@@ -247,8 +267,8 @@ keep their own licences; each folder has the licence text. If you redistribute t
 | Folder | What | From | Licence |
 |---|---|---|---|
 | `static/icons/` | Default icons | **SE98** by nestoris ([github.com/nestoris/Win98SE](https://github.com/nestoris/Win98SE)), based on [Chicago95](https://github.com/grassmunk/Chicago95) | GPL-2.0 |
-| `static/icons/command-prompt-*.png` | Command Prompt icon | Drawn for this theme | MIT |
-| `static/skins/zune/`, `static/skins/royale-noir/` | XP window, taskbar, Start menu and button images | **Windows XP Zune** and **Windows XP Royale Dark** by the [B00merang Project](https://github.com/B00merang-Project/windows-xp) | GPL-3.0 |
+| `static/icons/command-prompt-*.png`, `minefield-*.png`, `pairs-*.png` | Command Prompt, Minefield and Pairs icons | Drawn for this theme | MIT |
+| `static/skins/luna/`, `royale/`, `homestead/`, `metallic/`, `zune/`, `royale-noir/` | XP window, taskbar, Start menu and button images | **Windows XP** Luna, Royale, Homestead, Metallic, Zune and Royale Dark by the [B00merang Project](https://github.com/B00merang-Project/windows-xp) | GPL-3.0 |
 | `static/skins/xp-icons/` | Icons for the XP looks | **Windows XP** icon theme by [B00merang Artwork](https://github.com/B00merang-Artwork/Windows-XP) | GPL-2.0 |
 | `static/wallpapers/propaganda/` | Seamless tile wallpapers | **Propaganda** by Bowie J. Poag (via [BenjaminHCCarr/PropagandaTiles](https://github.com/BenjaminHCCarr/PropagandaTiles)) | GPL-2.0 |
 

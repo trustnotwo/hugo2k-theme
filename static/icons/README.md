@@ -31,5 +31,5 @@ Each file is named `<theme name>-<size>.png` and was taken unmodified from the S
 | `warning` | `SE98/status/{16,32}/dialog-warning.png` |
 | `zip` | `SE98/mimes/{16,32}/application-x-archive.png` |
 
-`command-prompt-16.png` and `command-prompt-32.png` are not from SE98: they were drawn for this theme and
+`command-prompt-*`, `minefield-*` and `pairs-*` are not from SE98: they were drawn for this theme and
 are MIT like the theme's code.

@@ -1,4 +1,4 @@
-/* hugo2k-theme — tiny window manager, plus Search, Command Prompt and Display Properties. Everything degrades gracefully without JS. */
+/* hugo2k-theme — tiny window manager, plus Search, Command Prompt, Display Properties and two games. Everything degrades gracefully without JS. */
 (function () {
   'use strict';
   var doc = document;
@@ -130,6 +130,7 @@
   // Close really closes: the window and its taskbar button go away; its spot stays empty.
   // Reopen it from the desktop icons or the Start menu (or reload the page).
   function close(win) {
+    if (win._cleanup) win._cleanup();   // stop a program's timers
     hideWin(win);
     if (win._task) { win._task.remove(); win._task = null; }
     wins = wins.filter(function (w) { return w !== win; });
@@ -986,8 +987,11 @@
       pv.style.setProperty('--pv-text', s.text || '#000');
       pv.style.setProperty('--pv-title-text', s.titleText || '#fff');
       // XP looks: draw the mini windows with the theme's own title bar, frame and button images
-      var chrome = (cfg.themes[T.themeId(draft)] || {}).chrome;
+      var thm = cfg.themes[T.themeId(draft)] || {}, chrome = thm.chrome;
       pv.classList.toggle('pv-xp', !!chrome);
+      pv.style.setProperty('--pv-bw', thm.bw || 4);
+      if (s.titleShadow) pv.style.setProperty('--pv-title-shadow', s.titleShadow); else pv.style.removeProperty('--pv-title-shadow');
+      if (s.inactiveText) pv.style.setProperty('--pv-inactive-text', s.inactiveText); else pv.style.removeProperty('--pv-inactive-text');
       if (chrome) {
         var dir = cfg.skinBase + chrome + '/';
         ['title-left', 'title-middle', 'title-right', 'frame', 'minimize', 'maximize', 'close'].forEach(function (n) {
@@ -1108,6 +1112,385 @@
     win._reopen = function (t) { load(); showTab(t || 'bg'); };
     win._reopen(tab);
   };
+
+  /* =====================================================================================
+     Games (Start menu): Minefield, a mine-clearing puzzle, and Pairs, a card-matching game.
+     Both are original and need no server. Best results are kept in this browser only.
+     ===================================================================================== */
+  var SCORE_KEY = 'theme98.scores';
+  function scoreGet(game, key) {
+    try { return ((JSON.parse(localStorage.getItem(SCORE_KEY) || '{}') || {})[game] || {})[key]; } catch (e) { return undefined; }
+  }
+  function scoreSet(game, key, val) {
+    try {
+      var all = JSON.parse(localStorage.getItem(SCORE_KEY) || '{}') || {};
+      (all[game] = all[game] || {})[key] = val;
+      localStorage.setItem(SCORE_KEY, JSON.stringify(all));
+    } catch (e) {}
+  }
+  function num3(n) { return n < 0 ? '-' + pad(Math.min(99, -n), 2) : pad(Math.min(999, n), 3); }
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; }
+    return a;
+  }
+  function levelOptions(levels) {
+    return Object.keys(levels).map(function (k) { return '<option value="' + k + '">' + esc(levels[k].label) + '</option>'; }).join('');
+  }
+  // Resize a floating game window to fit its board (the board changes size with the level).
+  function fitWindow(win) {
+    if (!win.classList.contains('is-floating') || win.classList.contains('is-maximized')) return;
+    var b = win._box || { x: 40, y: 40 };
+    win.style.setProperty('--w', 'max-content');
+    win.style.setProperty('--h', 'auto');
+    var r = win.getBoundingClientRect();
+    place(win, b.x, b.y, Math.ceil(r.width), Math.ceil(r.height));
+  }
+
+  /* ---------------------------------- Minefield ---------------------------------- */
+  var MF_LEVELS = {
+    easy: { c: 9, r: 9, m: 10, label: 'Easy' },
+    medium: { c: 16, r: 16, m: 40, label: 'Medium' },
+    hard: { c: 30, r: 16, m: 99, label: 'Hard' }
+  };
+
+  programs.minefield = function () {
+    var id = nextId('mf');
+    var win = makeWindow({
+      app: 'minefield', title: 'Minefield', icon: 'minefield', w: 300,
+      body:
+        '<div class="game game-mines">' +
+          '<div class="game-bar">' +
+            '<div class="game-lcd" title="Mines left (flags subtracted)"><span class="visually-hidden">Mines left</span><b class="mf-left">000</b></div>' +
+            '<button type="button" class="mf-new">New Game</button>' +
+            '<div class="game-lcd" title="Seconds"><span class="visually-hidden">Seconds</span><b class="mf-time">000</b></div>' +
+          '</div>' +
+          '<div class="game-bar game-opts">' +
+            '<label for="' + id + '-lv">Level:</label>' +
+            '<select id="' + id + '-lv" class="mf-level">' + levelOptions(MF_LEVELS) + '</select>' +
+            '<span class="field-row"><input type="checkbox" id="' + id + '-fm" class="mf-flagmode"><label for="' + id + '-fm">Flag mode</label></span>' +
+          '</div>' +
+          '<div class="game-board-wrap"><div class="mf-field" tabindex="0" role="application" ' +
+            'aria-label="Minefield. Arrow keys move, Space opens a square, F plants a flag."></div></div>' +
+          '<p class="game-hint mf-hint"></p>' +
+          '<span class="visually-hidden mf-sr" role="status"></span>' +
+        '</div>',
+      status: '<p class="status-bar-field mf-status" role="status"></p><p class="status-bar-field mf-best"></p>'
+    });
+    var $ = function (s) { return win.querySelector(s); };
+    var field = $('.mf-field'), leftEl = $('.mf-left'), timeEl = $('.mf-time'), statusEl = $('.mf-status'), bestEl = $('.mf-best'), hintEl = $('.mf-hint');
+    var levelSel = $('.mf-level'), flagMode = $('.mf-flagmode'), srEl = $('.mf-sr');
+    var lv, cols, rows, mines, total, cells, els, opened, flags, started, over, cur, t0, timer, lastType = '';
+    var saved = scoreGet('minefield', 'level');
+    if (MF_LEVELS[saved]) levelSel.value = saved;
+
+    function nb(i) {
+      var c = i % cols, r = (i - c) / cols, out = [];
+      for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        var rr = r + dr, cc = c + dc;
+        if (rr >= 0 && rr < rows && cc >= 0 && cc < cols) out.push(rr * cols + cc);
+      }
+      return out;
+    }
+    function label(i) {
+      var c = cells[i], pos = 'Row ' + (Math.floor(i / cols) + 1) + ', column ' + (i % cols + 1) + ': ';
+      if (c.flag && !c.open) return pos + 'flagged';
+      if (!c.open) return pos + 'hidden';
+      if (c.mine) return pos + 'mine';
+      return pos + (c.n ? c.n + (c.n === 1 ? ' mine' : ' mines') + ' nearby' : 'clear');
+    }
+    function paint(i) {
+      var c = cells[i], cls = 'mf-cell';
+      if (c.open) {
+        cls += ' is-open';
+        if (c.mine) cls += c.boom ? ' is-mine is-boom' : ' is-mine';
+        else if (c.n) cls += ' n' + c.n;
+      } else if (c.flag) cls += c.wrong ? ' is-flag is-wrong' : ' is-flag';
+      if (i === cur) cls += ' is-cursor';
+      els[i].className = cls;
+      els[i].textContent = c.open && !c.mine && c.n ? c.n : '';
+    }
+    function setLeft() { leftEl.textContent = num3(mines - flags); }
+    function secs() { return t0 ? Math.min(999, Math.floor((Date.now() - t0) / 1000)) : 0; }
+    function tick() { timeEl.textContent = num3(secs()); }
+    function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+    function showBest() {
+      var b = scoreGet('minefield', lv);
+      bestEl.textContent = b ? 'Best ' + b + ' s' : 'No best yet';
+    }
+    function setCursor(i) {
+      var old = cur;
+      cur = i;
+      if (old != null && els[old]) paint(old);
+      paint(i);
+      srEl.textContent = label(i);
+    }
+
+    function newGame() {
+      stopTimer();
+      lv = levelSel.value;
+      var L = MF_LEVELS[lv];
+      cols = L.c; rows = L.r; mines = L.m; total = cols * rows;
+      cells = [];
+      var html = '';
+      for (var i = 0; i < total; i++) { cells.push({ mine: false, n: 0, open: false, flag: false }); html += '<div class="mf-cell" data-i="' + i + '"></div>'; }
+      opened = 0; flags = 0; started = false; over = false; t0 = 0; cur = null;
+      field.innerHTML = html;
+      field.style.setProperty('--cols', cols);
+      els = Array.prototype.slice.call(field.children);
+      timeEl.textContent = '000';
+      setLeft();
+      statusEl.textContent = 'Click a square to start.';
+      hintEl.textContent = cols + ' x ' + rows + ' squares, ' + mines + ' mines. Right-click or press F to plant a flag; long-press on a touch screen. Click a number to open its neighbours once its flags add up.';
+      showBest();
+      scoreSet('minefield', 'level', lv);
+      setCursor(Math.floor(rows / 2) * cols + Math.floor(cols / 2));
+      fitWindow(win);
+    }
+
+    // Mines go down on the first click, never on it (or, where there's room, next to it).
+    function layMines(safe) {
+      var avoid = {};
+      avoid[safe] = 1;
+      if (total - 9 >= mines) nb(safe).forEach(function (j) { avoid[j] = 1; });
+      var pool = [];
+      for (var i = 0; i < total; i++) if (!avoid[i]) pool.push(i);
+      shuffle(pool);
+      for (i = 0; i < mines; i++) cells[pool[i]].mine = true;
+      for (i = 0; i < total; i++) cells[i].n = nb(i).filter(function (k) { return cells[k].mine; }).length;
+    }
+
+    function finish(won, hit) {
+      over = true;
+      stopTimer();
+      var s = secs(), i, c;
+      timeEl.textContent = num3(s);
+      if (won) {
+        for (i = 0; i < total; i++) if (cells[i].mine && !cells[i].flag) { cells[i].flag = true; paint(i); }
+        flags = mines;
+        setLeft();
+        var sc = Math.max(1, s), best = scoreGet('minefield', lv), fresh = !best || sc < best;
+        if (fresh) scoreSet('minefield', lv, sc);
+        showBest();
+        statusEl.textContent = 'Cleared in ' + s + ' s!' + (fresh ? ' New best.' : '');
+      } else {
+        cells[hit].open = true;
+        cells[hit].boom = true;
+        for (i = 0; i < total; i++) {
+          c = cells[i];
+          if (c.mine && !c.flag) c.open = true;
+          else if (c.flag && !c.mine) c.wrong = true;
+          paint(i);
+        }
+        statusEl.textContent = 'Boom! Press New Game.';
+      }
+    }
+
+    function reveal(i) {
+      var c = cells[i];
+      if (over || c.open || c.flag) return;
+      if (!started) { started = true; layMines(i); t0 = Date.now(); timer = setInterval(tick, 250); statusEl.textContent = 'Clear every safe square.'; }
+      if (c.mine) { finish(false, i); return; }
+      var stack = [i];
+      while (stack.length) {
+        var k = stack.pop(), ck = cells[k];
+        if (ck.open || ck.flag) continue;
+        ck.open = true;
+        opened++;
+        paint(k);
+        if (ck.n === 0) nb(k).forEach(function (j) { if (!cells[j].open && !cells[j].flag) stack.push(j); });
+      }
+      if (opened === total - mines) finish(true);
+    }
+    function toggleFlag(i) {
+      var c = cells[i];
+      if (over || c.open) return;
+      c.flag = !c.flag;
+      flags += c.flag ? 1 : -1;
+      paint(i);
+      setLeft();
+    }
+    // Opening a number whose flags add up opens the rest of its neighbours.
+    function chord(i) {
+      var c = cells[i];
+      if (!c.open || !c.n) return;
+      var around = nb(i), f = around.filter(function (k) { return cells[k].flag; }).length;
+      if (f === c.n) around.forEach(function (k) { reveal(k); });
+    }
+    function activate(i) { if (cells[i].open) chord(i); else reveal(i); }
+
+    // Mouse: click opens, right-click flags. Touch: tap opens (or flags in Flag mode), long-press flags.
+    var press = null, longPressed = false;
+    field.addEventListener('pointerdown', function (e) {
+      lastType = e.pointerType;
+      longPressed = false;
+      if (e.pointerType !== 'touch') return;
+      var el = e.target.closest('.mf-cell');
+      if (!el) return;
+      press = setTimeout(function () {
+        longPressed = true;
+        toggleFlag(+el.getAttribute('data-i'));
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch (err) {}
+      }, 420);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (ev) {
+      field.addEventListener(ev, function () { clearTimeout(press); });
+    });
+    field.addEventListener('click', function (e) {
+      var el = e.target.closest('.mf-cell');
+      if (!el) return;
+      if (longPressed) { longPressed = false; return; }
+      var i = +el.getAttribute('data-i');
+      if (flagMode.checked) toggleFlag(i); else activate(i);
+      setCursor(i);
+    });
+    field.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      var el = e.target.closest('.mf-cell');
+      if (el && lastType !== 'touch') { var i = +el.getAttribute('data-i'); toggleFlag(i); setCursor(i); }
+    });
+    field.addEventListener('keydown', function (e) {
+      var r = Math.floor(cur / cols), c = cur % cols, k = e.key, moved = true;
+      if (k === 'ArrowLeft') c = Math.max(0, c - 1);
+      else if (k === 'ArrowRight') c = Math.min(cols - 1, c + 1);
+      else if (k === 'ArrowUp') r = Math.max(0, r - 1);
+      else if (k === 'ArrowDown') r = Math.min(rows - 1, r + 1);
+      else if (k === 'Home') c = 0;
+      else if (k === 'End') c = cols - 1;
+      else moved = false;
+      if (moved) { e.preventDefault(); setCursor(r * cols + c); return; }
+      if (k === ' ' || k === 'Enter') { e.preventDefault(); activate(cur); srEl.textContent = label(cur); }
+      else if (k === 'f' || k === 'F') { e.preventDefault(); toggleFlag(cur); srEl.textContent = label(cur); }
+    });
+    levelSel.addEventListener('change', newGame);
+    $('.mf-new').addEventListener('click', newGame);
+    win._cleanup = stopTimer;
+    newGame();
+    field.focus({ preventScroll: true });
+  };
+
+  /* ------------------------------------ Pairs ------------------------------------ */
+  var PR_NAMES = ['computer', 'document', 'folder', 'help', 'image', 'info', 'internet', 'my-documents',
+                  'network', 'notepad', 'recycle-bin', 'run', 'search', 'settings', 'warning', 'zip'];
+  var PR_LEVELS = {
+    easy: { c: 4, r: 3, label: 'Easy' },
+    medium: { c: 4, r: 4, label: 'Medium' },
+    hard: { c: 6, r: 4, label: 'Hard' }
+  };
+
+  programs.pairs = function () {
+    var id = nextId('pr');
+    var win = makeWindow({
+      app: 'pairs', title: 'Pairs', icon: 'pairs', w: 320,
+      body:
+        '<div class="game game-pairs">' +
+          '<div class="game-bar">' +
+            '<div class="game-lcd" title="Moves"><span class="visually-hidden">Moves</span><b class="pr-moves">000</b></div>' +
+            '<button type="button" class="pr-new">New Game</button>' +
+            '<div class="game-lcd" title="Seconds"><span class="visually-hidden">Seconds</span><b class="pr-time">000</b></div>' +
+          '</div>' +
+          '<div class="game-bar game-opts">' +
+            '<label for="' + id + '-lv">Level:</label>' +
+            '<select id="' + id + '-lv" class="pr-level">' + levelOptions(PR_LEVELS) + '</select>' +
+          '</div>' +
+          '<div class="game-board-wrap"><div class="pr-board" role="group" aria-label="Cards"></div></div>' +
+          '<p class="game-hint pr-hint"></p>' +
+        '</div>',
+      status: '<p class="status-bar-field pr-status" role="status"></p><p class="status-bar-field pr-best"></p>'
+    });
+    var $ = function (s) { return win.querySelector(s); };
+    var board = $('.pr-board'), movesEl = $('.pr-moves'), timeEl = $('.pr-time'), statusEl = $('.pr-status'), bestEl = $('.pr-best'), hintEl = $('.pr-hint');
+    var levelSel = $('.pr-level');
+    var lv, cards, first, busy, moves, matched, t0, timer, hideTimer;
+    var saved = scoreGet('pairs', 'level');
+    if (PR_LEVELS[saved]) levelSel.value = saved;
+
+    function secs() { return t0 ? Math.min(999, Math.floor((Date.now() - t0) / 1000)) : 0; }
+    function tick() { timeEl.textContent = num3(secs()); }
+    function stopTimer() { if (timer) { clearInterval(timer); timer = null; } }
+    function showBest() {
+      var b = scoreGet('pairs', lv);
+      bestEl.textContent = b ? 'Best ' + b + ' moves' : 'No best yet';
+    }
+    function paintCard(i) {
+      var c = cards[i], el = board.children[i];
+      el.className = 'pr-card' + (c.done ? ' is-done' : c.up ? ' is-up' : '');
+      el.setAttribute('aria-label', 'Card ' + (i + 1) + ', ' + (c.up || c.done ? c.name.replace(/-/g, ' ') + (c.done ? ', matched' : '') : 'face down'));
+    }
+
+    function newGame() {
+      clearTimeout(hideTimer);
+      stopTimer();
+      lv = levelSel.value;
+      var L = PR_LEVELS[lv], n = L.c * L.r / 2;
+      var pool = shuffle(PR_NAMES.slice()).slice(0, n);
+      cards = shuffle(pool.concat(pool)).map(function (name) { return { name: name, up: false, done: false }; });
+      first = -1; busy = false; moves = 0; matched = 0; t0 = 0;
+      board.style.setProperty('--cols', L.c);
+      board.innerHTML = cards.map(function (c, i) {
+        return '<div class="pr-card" role="button" tabindex="0" data-i="' + i + '" aria-label="Card ' + (i + 1) + ', face down">' +
+          '<img src="' + esc(iconUrl(c.name, 32)) + '" alt="" width="32" height="32"></div>';
+      }).join('');
+      movesEl.textContent = '000';
+      timeEl.textContent = '000';
+      statusEl.textContent = 'Find the matching pairs.';
+      hintEl.textContent = cards.length + ' cards, ' + (cards.length / 2) + ' pairs. Flip two at a time; the fewer moves the better.';
+      showBest();
+      scoreSet('pairs', 'level', lv);
+      fitWindow(win);
+    }
+
+    function finish() {
+      stopTimer();
+      var s = secs(), best = scoreGet('pairs', lv), fresh = !best || moves < best;
+      if (fresh) scoreSet('pairs', lv, moves);
+      showBest();
+      statusEl.textContent = 'Done: ' + moves + ' moves, ' + s + ' s!' + (fresh ? ' New best.' : '');
+    }
+
+    function flip(i) {
+      var c = cards[i];
+      if (busy || c.up || c.done) return;
+      if (!t0) { t0 = Date.now(); timer = setInterval(tick, 250); }
+      c.up = true;
+      paintCard(i);
+      if (first < 0) { first = i; return; }
+      moves++;
+      movesEl.textContent = num3(moves);
+      var a = cards[first], f = first;
+      first = -1;
+      if (a.name === c.name) {
+        a.done = c.done = true;
+        a.up = c.up = false;
+        paintCard(f); paintCard(i);
+        matched++;
+        statusEl.textContent = 'A match! ' + matched + ' of ' + (cards.length / 2) + '.';
+        if (matched === cards.length / 2) finish();
+      } else {
+        busy = true;
+        statusEl.textContent = 'Not a match.';
+        hideTimer = setTimeout(function () {
+          a.up = false; c.up = false;
+          paintCard(f); paintCard(i);
+          busy = false;
+        }, 850);
+      }
+    }
+
+    board.addEventListener('click', function (e) {
+      var el = e.target.closest('.pr-card');
+      if (el) flip(+el.getAttribute('data-i'));
+    });
+    board.addEventListener('keydown', function (e) {
+      var el = e.target.closest('.pr-card');
+      if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(+el.getAttribute('data-i')); }
+    });
+    levelSel.addEventListener('change', newGame);
+    $('.pr-new').addEventListener('click', newGame);
+    win._cleanup = function () { stopTimer(); clearTimeout(hideTimer); };
+    newGame();
+  };
+
 
   /* ---------------------------- Desktop right-click menu ---------------------------- */
   var iconBox = doc.querySelector('.desktop-icons');

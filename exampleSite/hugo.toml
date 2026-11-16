@@ -13,7 +13,8 @@ themesDir = "../.."
 
 [params]
   description = "A personal site that boots straight into the desktop."
-  style = "2000"              # default look: "2000", "98", "dark", "zune", "royale-noir", "zune-dark" or "royale-noir-dark"
+  style = "2000"              # default look: "2000", "98", "dark", "luna", "royale", "homestead", "metallic",
+                              # "zune", "royale-noir", "zune-dark" or "royale-noir-dark"
                               # (visitors can switch in Start > Settings; see data/themes.yaml in the theme)
   mainSections = ["posts"]
   dateFormat = "1/2/2006"
@@ -36,6 +37,11 @@ themesDir = "../.."
   # darkWallpaperPosition = "tile"      # stretch (default), center or tile
 
   # hideEmptySections = false           # show menu entries for sections that have no pages yet
+  # games = false                       # remove Minefield and Pairs from the Start menu
+
+  # A look can start with its own wallpaper (until the visitor picks one):
+  # [params.lookWallpapers]
+  #   luna = "/images/hills.webp"        # an image in static/images/
 
   # Icons: the theme ships the SE98 set. Put a file with the same name in static/icons/ to replace one.
   # iconFormat = "svg"        # use your own static/icons/<name>.svg instead of PNGs

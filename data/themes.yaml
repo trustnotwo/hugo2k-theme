@@ -16,13 +16,42 @@
   base: "98"
   files: [classic, skins/98]
   pv: { desktop: "#008080", face: "#c0c0c0", a: "#000080", b: "#1084d0", ia: "#808080", ib: "#b5b5b5", window: "#fff", text: "#000" }
-- id: dark
-  name: Windows 2000 (dark)
+- id: luna
+  name: Windows XP Luna
   group: Windows
   base: "98"
-  dark: true
-  files: [classic, skins/2000, skins/dark, skins/dark-icons]
-  pv: { desktop: "#1d2a3a", face: "#2d2d30", a: "#1e3a66", b: "#3f6aa8", ia: "#3a3a3e", ib: "#4c4c52", window: "#1e1e1e", text: "#d8d8d8" }
+  chrome: luna
+  bw: 5
+  icons: xp
+  files: [classic, skins/xp-shared, skins/luna]
+  pv: { desktop: "#004e98", face: "#ece9d8", a: "#0058e6", b: "#3a8cff", ia: "#7a99e0", ib: "#80a5e7", window: "#fff", text: "#000", inactiveText: "#d8e4f8" }
+- id: royale
+  name: Windows XP Royale
+  group: Windows
+  base: "98"
+  chrome: royale
+  bw: 4
+  icons: xp
+  files: [classic, skins/xp-shared, skins/royale]
+  pv: { desktop: "#2a4a9c", face: "#ebe9ed", a: "#376fc2", b: "#6daae9", ia: "#4d73c3", ib: "#8ec0e6", window: "#fff", text: "#000", inactiveText: "#ffffff" }
+- id: homestead
+  name: Windows XP Homestead
+  group: Windows
+  base: "98"
+  chrome: homestead
+  bw: 5
+  icons: xp
+  files: [classic, skins/xp-shared, skins/homestead]
+  pv: { desktop: "#5a6f3a", face: "#ece9d8", a: "#8ba169", b: "#bec98f", ia: "#d6d8bb", ib: "#deddc1", window: "#fff", text: "#000", inactiveText: "#6a6f55" }
+- id: metallic
+  name: Windows XP Metallic
+  group: Windows
+  base: "98"
+  chrome: metallic
+  bw: 5
+  icons: xp
+  files: [classic, skins/xp-shared, skins/metallic]
+  pv: { desktop: "#6a6f8c", face: "#e6e6ed", a: "#afaec7", b: "#e3e5eb", ia: "#babac5", ib: "#fdfffc", window: "#fff", text: "#000", titleText: "#000", titleShadow: "1px 1px 0 #fff", inactiveText: "#8a8a8a" }
 - id: zune
   name: Windows XP Zune
   group: Windows
@@ -39,6 +68,13 @@
   icons: xp
   files: [classic, skins/xp-shared, skins/royale-noir]
   pv: { desktop: "#0f1626", face: "#ebe9ed", a: "#161d2d", b: "#556271", ia: "#040a17", ib: "#2b333b", window: "#fff", text: "#000" }
+- id: dark
+  name: Windows 2000 (dark)
+  group: Windows
+  base: "98"
+  dark: true
+  files: [classic, skins/2000, skins/dark, skins/dark-icons]
+  pv: { desktop: "#1d2a3a", face: "#2d2d30", a: "#1e3a66", b: "#3f6aa8", ia: "#3a3a3e", ib: "#4c4c52", window: "#1e1e1e", text: "#d8d8d8" }
 - id: zune-dark
   name: Windows XP Zune (dark)
   group: Windows

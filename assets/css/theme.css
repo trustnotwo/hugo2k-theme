@@ -926,14 +926,14 @@ html.js .start-menu .separator.js-only { display: block !important; }
 .dp-mini-title { padding: 2px 4px; color: var(--pv-title-text, #fff); font-weight: bold; background: linear-gradient(90deg, var(--pv-a), var(--pv-b)); }
 .dp-mini.inactive .dp-mini-title { color: var(--pv-face); background: linear-gradient(90deg, var(--pv-ia), var(--pv-ib)); }
 .dp-mini-title { display: flex; align-items: center; }
-.dp-mini-title span { flex: 1; overflow: hidden; white-space: nowrap; }
-.dp-mini-btns { display: none; }
+.dp-mini-title > span:first-child { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; }   /* the text takes the room; the buttons keep their size */
+.dp-mini-title .dp-mini-btns { display: none; flex: none; }
 /* XP looks: the real title bar, frame and buttons, at preview scale */
 .dp-preview.pv-xp .dp-mini {
   padding: 0 0 3px;
   border: solid transparent;
   border-width: 0 3px 3px;
-  border-image: var(--pv-frame) 0 4 4 4 / 0 3px 3px 3px;
+  border-image: var(--pv-frame) 0 var(--pv-bw, 4) var(--pv-bw, 4) var(--pv-bw, 4) / 0 3px 3px 3px;
   box-shadow: none;
   clip-path: inset(0 round 6px 6px 0 0);
 }
@@ -942,17 +942,17 @@ html.js .start-menu .separator.js-only { display: block !important; }
   margin: 0 -3px;
   padding: 0 4px 0 8px;
   font: bold 12px "Trebuchet MS", Tahoma, sans-serif;
-  text-shadow: 1px 1px 1px #000;
+  text-shadow: var(--pv-title-shadow, 1px 1px 1px #000);
   background:
     var(--pv-title-left) left top / 6px 22px no-repeat,
     var(--pv-title-right) right top / 6px 22px no-repeat,
     var(--pv-title-middle) 6px 0 / calc(100% - 12px) 22px no-repeat;
 }
-.dp-preview.pv-xp .dp-mini.inactive .dp-mini-title { color: #c8ccd4; position: relative; }
+.dp-preview.pv-xp .dp-mini.inactive .dp-mini-title { color: var(--pv-inactive-text, #c8ccd4); position: relative; }
 .dp-preview.pv-xp .dp-mini.inactive .dp-mini-title::after {
   content: ""; position: absolute; inset: 0 1px; border-radius: 5px 5px 0 0; background: rgba(255, 255, 255, .16);
 }
-.dp-preview.pv-xp .dp-mini-btns { display: flex; gap: 1px; }
+.dp-preview.pv-xp .dp-mini-title .dp-mini-btns { display: flex; gap: 1px; margin-left: 6px; }
 .dp-preview.pv-xp .dp-mini-btns i { width: 15px; height: 15px; background: center / 15px 15px no-repeat; }
 .dp-preview.pv-xp .dp-mini-btns .min { background-image: var(--pv-minimize); }
 .dp-preview.pv-xp .dp-mini-btns .max { background-image: var(--pv-maximize); }
@@ -1023,6 +1023,83 @@ html.js .start-menu .separator.js-only { display: block !important; }
   .dp-row { flex-direction: column; }
   .dp-wallpapers, .dp-side { width: 100%; }
 }
+
+/* ---------- Games: Minefield and Pairs (theme98.js) ---------- */
+
+.game { display: flex; flex-direction: column; gap: 6px; padding: 6px; margin: 0 auto; width: max-content; max-width: 100%; }
+.game-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.game-opts { justify-content: flex-start; flex-wrap: wrap; }
+.game-opts .field-row { margin-left: 8px; }
+.game-lcd { min-width: 56px; padding: 3px 6px; background: #140a0a; box-shadow: var(--sunken); text-align: right; line-height: 1; }
+.game-lcd b { font: bold 20px/1 "Courier New", monospace; letter-spacing: 1px; color: #ff4a3a; text-shadow: 0 0 4px rgba(255, 74, 58, .55); }
+.game-hint { margin: 0; width: 0; min-width: 100%; white-space: normal; color: var(--muted); font-size: 11px; line-height: 1.4; }  /* wraps; never widens the window */
+.game-board-wrap { overflow: auto; max-width: 100%; padding: 4px; background: var(--face); box-shadow: var(--sunken); }
+
+/* Minefield */
+.game-mines { --cell: 24px; --n1: #1f4fd8; --n2: #0b7a2a; --n3: #c4261d; --n4: #14248a; --n5: #8a1d1d; --n6: #0f7c86; --n7: #222; --n8: #666; }
+html.theme-dark .game-mines { --n1: #6fa3ff; --n2: #4fd37a; --n3: #ff7a70; --n4: #8b9dff; --n5: #ff9a8a; --n6: #4fd6dd; --n7: #ddd; --n8: #aaa; }
+.mf-field {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 9), var(--cell));
+  width: max-content;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.mf-cell {
+  width: var(--cell);
+  height: var(--cell);
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  font: bold 15px/1 var(--font);
+  cursor: default;
+  color: var(--window-text);
+  background: var(--face);
+  box-shadow: inset 2px 2px var(--white), inset -2px -2px var(--shadow);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+.mf-cell:not(.is-open):not(.is-flag):hover { filter: brightness(1.1); }
+.mf-cell.is-open { background-color: var(--window); box-shadow: inset 0 0 0 1px var(--line); }
+.mf-cell.n1 { color: var(--n1); } .mf-cell.n2 { color: var(--n2); } .mf-cell.n3 { color: var(--n3); } .mf-cell.n4 { color: var(--n4); }
+.mf-cell.n5 { color: var(--n5); } .mf-cell.n6 { color: var(--n6); } .mf-cell.n7 { color: var(--n7); } .mf-cell.n8 { color: var(--n8); }
+.mf-cell.is-flag { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%238a8f99' d='M7 2h1.6v10H7z'/%3E%3Cpath fill='%238a8f99' d='M4 12h8v2H4z'/%3E%3Cpath fill='%23e0352b' d='M8.6 2L14 4.6 8.6 7.2z'/%3E%3C/svg%3E"); }
+.mf-cell.is-mine { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v13M1.5 8h13M3.4 3.4l9.2 9.2M12.6 3.4l-9.2 9.2' stroke='%232b2e36' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='8' cy='8' r='4.2' fill='%232b2e36' stroke='%23c9ced8' stroke-width='.8'/%3E%3Ccircle cx='6.6' cy='6.6' r='1.1' fill='%23fff' opacity='.85'/%3E%3C/svg%3E"); }
+.mf-cell.is-flag.is-wrong { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3l10 10M13 3L3 13' stroke='%23d23a2e' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%238a8f99' d='M7 2h1.6v10H7z'/%3E%3Cpath fill='%238a8f99' d='M4 12h8v2H4z'/%3E%3Cpath fill='%23e0352b' d='M8.6 2L14 4.6 8.6 7.2z'/%3E%3C/svg%3E"); }
+.mf-cell.is-boom { background-color: #d23a2e; }
+.mf-field:focus-visible .mf-cell.is-cursor { outline: 2px dotted var(--focus); outline-offset: -4px; }
+
+/* Pairs */
+.pr-board { display: grid; grid-template-columns: repeat(var(--cols, 4), 58px); gap: 6px; padding: 4px; width: max-content; }
+.pr-card {
+  position: relative;
+  width: 58px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+  background: var(--face);
+  box-shadow: var(--raised);
+}
+.pr-card::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  background: repeating-linear-gradient(45deg, var(--shadow) 0 2px, transparent 2px 6px);
+  box-shadow: inset 0 0 0 1px var(--shadow);
+  opacity: .55;
+}
+.pr-card:hover { filter: brightness(1.08); }
+.pr-card img { display: none; width: 32px; height: 32px; }
+.pr-card.is-up, .pr-card.is-done { background: var(--window); box-shadow: var(--sunken); cursor: default; }
+.pr-card.is-up::before, .pr-card.is-done::before { display: none; }
+.pr-card.is-up img, .pr-card.is-done img { display: block; }
+.pr-card.is-done { opacity: .6; }
+.pr-card:focus-visible { outline: 2px dotted var(--focus); outline-offset: 2px; }
 
 /* ---------- Small screens ---------- */
 

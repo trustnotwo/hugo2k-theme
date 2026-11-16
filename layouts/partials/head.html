@@ -26,7 +26,7 @@
   {{- $parts := slice (resources.Get "css/theme.css") }}
   {{- range .files }}{{ with resources.Get (printf "css/%s.css" .) }}{{ $parts = $parts | append . }}{{ end }}{{ end }}
   {{- $css := $parts | resources.Concat (printf "css/site-%s.css" .id) | minify | fingerprint }}
-  {{- $themes = merge $themes (dict .id (dict "href" $css.RelPermalink "integrity" $css.Data.Integrity "base" .base "name" .name "group" .group "dark" (.dark | default false) "icons" (.icons | default "") "chrome" (.chrome | default "") "pv" (.pv | default dict))) }}
+  {{- $themes = merge $themes (dict .id (dict "href" $css.RelPermalink "integrity" $css.Data.Integrity "base" .base "name" .name "group" .group "dark" (.dark | default false) "icons" (.icons | default "") "chrome" (.chrome | default "") "bw" (.bw | default 4) "pv" (.pv | default dict))) }}
   {{- $order = $order | append .id }}
 {{- end }}
 {{- $cur := index $themes $style }}
@@ -38,11 +38,14 @@
 {{- $wallpapers := slice }}
 {{- with site.Params.wallpapers }}{{ range . }}{{ $wallpapers = $wallpapers | append (dict "name" .name "url" (.url | relURL) "tile" (.tile | default false) "size" (.size | default 0)) }}{{ end }}
 {{- else }}{{ with site.Params.wallpaper }}{{ $wallpapers = $wallpapers | append (dict "name" (site.Params.wallpaperName | default (path.BaseName .)) "url" (. | relURL)) }}{{ end }}{{ end }}
+{{- /* params.lookWallpapers: a wallpaper a look starts with (e.g. luna = "/images/hills.webp") */}}
+{{- $lookWp := dict }}
+{{- range $k, $v := site.Params.lookWallpapers }}{{ $lookWp = merge $lookWp (dict $k ($v | relURL)) }}{{ end }}
 {{- if ne site.Params.themeWallpapers false }}
   {{- range hugo.Data.wallpapers }}{{ $wallpapers = $wallpapers | append (dict "name" .name "url" (printf "wallpapers/%s" .file | relURL) "tile" (.tile | default false) "size" (.size | default 0)) }}{{ end }}
 {{- end }}
 {{- $icons := dict }}
-{{- range slice "command-prompt" "computer" "document" "folder" "folder-open" "search" "settings" "info" "warning" "error" }}
+{{- range slice "command-prompt" "computer" "document" "folder" "folder-open" "search" "settings" "info" "warning" "error" "minefield" "pairs" "help" "image" "internet" "my-documents" "network" "notepad" "recycle-bin" "run" "zip" }}
   {{- $icons = merge $icons (dict . (dict "16" (partial "icon-url.html" (dict "name" . "size" 16)) "32" (partial "icon-url.html" (dict "name" . "size" 32)))) }}
 {{- end }}
 {{- /* Icon sets a look can use instead of static/icons/ (names it doesn't have fall back) */}}
@@ -60,6 +63,7 @@
       "darkWallpaper" (cond (isset site.Params "darkwallpaper") (site.Params.darkWallpaper | relURL) "")
       "darkWallpaperPosition" (site.Params.darkWallpaperPosition | default "")
       "wallpaperPosition" (site.Params.wallpaperPosition | default "")
+      "lookWallpapers" $lookWp
       "iconSets" $iconSets
       "skinBase" ("skins/" | relURL)
       "desktopColor" (site.Params.desktopColor | default "")
@@ -93,9 +97,10 @@
       return !(p.style && cfg.themes[p.style]) && !!cfg.autoDark && !!cfg.themes[cfg.darkStyle] &&
         !!window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
     },
-    // The wallpaper and picture position used when the visitor hasn't chosen one.
-    defaultWallpaper: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaper : cfg.wallpaper; },
-    defaultPosition: function (p) { return T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaperPosition : cfg.wallpaperPosition; },
+    // The wallpaper and picture position used when the visitor hasn't chosen one: the look's own, else the dark-mode one, else the site's.
+    lookWallpaper: function (p) { return (cfg.lookWallpapers && cfg.lookWallpapers[T.themeId(p)]) || ''; },
+    defaultWallpaper: function (p) { return T.lookWallpaper(p) || (T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaper : cfg.wallpaper); },
+    defaultPosition: function (p) { return T.lookWallpaper(p) ? '' : (T.autoDarkOn(p) && cfg.darkWallpaper ? cfg.darkWallpaperPosition : cfg.wallpaperPosition); },
     // Background image URL for a prefs object ('' = none).
     wallpaperUrl: function (p) {
       if (!('wallpaper' in p)) return T.defaultWallpaper(p);
